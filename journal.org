@@ -1,0 +1,4 @@
+nom, prenom, email
+Tazouev Arbi, tazouev.arbi@gmail.com
+Guinet Virgile, virgile.guinet@gmail.com
+projet: DoomMetal
