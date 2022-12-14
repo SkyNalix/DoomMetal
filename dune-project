@@ -7,9 +7,9 @@
 (source
  (github username/reponame))
 
-(authors "Author Name")
+(authors "Tazouev Arbi & Guinet Virgile")
 
-(maintainers "Maintainer Name")
+(maintainers "Tazouev Arbi")
 
 (license LICENSE)
 
@@ -19,7 +19,7 @@
  (name DoomMetal)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune)
+ (depends ocaml dune bogue)
  (tags
   (topics "to describe" your project)))
 

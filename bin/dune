@@ -1,4 +1,4 @@
 (executable
  (public_name DoomMetal)
  (name main)
- (libraries DoomMetal))
+ (libraries DoomMetal bogue))
