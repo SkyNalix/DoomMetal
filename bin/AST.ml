@@ -9,10 +9,11 @@ type intPosition = { mutable x : int; mutable y : int }
 type position = { mutable x : float; mutable y : float }
 
 type player = {
-  pos : position
+  pos : position;
+  view_angle : int
 }
 
 type level = { 
-  player : player; 
-  plot : plot
+  mutable player : player; 
+  mutable plot : plot
 }

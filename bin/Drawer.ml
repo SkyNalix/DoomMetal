@@ -24,8 +24,8 @@ let drawLevel area level height width : unit =
     let rec drawPlot y x : unit =
         A.fill_rectangle area 
             ~color:(Draw.opaque (if plot.(y).(x) = WALL then Draw.red else Draw.white)) 
-            ~w:(block_width-1)
-            ~h:(block_height-1)
+            ~w:(block_width)
+            ~h:(block_height)
             (x*block_width, y*block_height);
         let (y,x) = if x >= plot_width-1 then (y+1,0) else (y,x+1) in
         if y >= plot_height then () else drawPlot y x
