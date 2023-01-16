@@ -1,9 +1,10 @@
 open AST
-open Printf
-
+open Bogue
+module W = Widget
+module A = Sdl_area
 
 (* Define a function to perform the raycast *)
-let raycast level mouse_pos =
+let raycast_on_angle level mouse_pos =
     let plot = level.plot in
     let player_pos = level.player.pos in
 
@@ -64,4 +65,50 @@ let raycast level mouse_pos =
         else (sideDist.y -. deltaDist.y);
     ) in
 
-    (hit, perpWallDist, map)
+    (hit, perpWallDist, map);;
+
+
+let aux_raycast windows_info level angle =
+
+    let width= windows_info.width in
+    let height = windows_info.height in
+    let player = level.player in
+    let block_width = (width / (Array.length level.plot.(0))) in
+    let block_height = (height / (Array.length level.plot)) in
+
+    let player_posX = int_of_float (float_of_int block_width *. player.pos.x) in
+    let player_posY = int_of_float (float_of_int block_height *. player.pos.y) in
+
+    let radians = (float_of_int angle) *. (Float.pi /. 180.) in
+    let viewVect = { x=sin radians; y=cos radians} in
+    viewVect.x <- (viewVect.x *. (float_of_int width)  +. (float_of_int block_width *. player.pos.x ));
+    viewVect.y <- (viewVect.y *. (float_of_int height) +. (float_of_int block_height *. player.pos.y ));
+
+    A.draw_line windows_info.draw_area
+        ~color:(Draw.opaque Draw.grey)
+        ~thick:2
+        (int_of_float viewVect.x, int_of_float viewVect.y)
+        (player_posX, player_posY);
+    
+    (* positions de la souris relativement dans le plot *)
+    let mouse_pos = {x=viewVect.x /. float_of_int block_width; y=viewVect.y /. float_of_int block_height} in
+    let (tileFound, _, touched_pos) = 
+        raycast_on_angle level mouse_pos in
+
+    if tileFound then (
+        A.fill_rectangle windows_info.draw_area 
+            ~color:(Draw.opaque Draw.blue)
+            ~w:(block_width)
+            ~h:(block_height)
+            ((int_of_float touched_pos.x)*block_width, (int_of_float touched_pos.y)*block_height);
+        Sdl_area.update windows_info.draw_area;
+        W.update windows_info.draw_area_widget;
+        W.update windows_info.label;
+    );
+    ();;
+
+let raycast windows_info level = 
+    let view_angle = level.player.view_angle in
+    for i = view_angle-25 to view_angle+25 do
+        aux_raycast windows_info level i;
+    done;

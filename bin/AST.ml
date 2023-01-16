@@ -1,6 +1,8 @@
+open Bogue
 
 type tile = 
   | WALL
+  | REDWALL
   | NOTHING
 
 type plot = tile array array
@@ -16,4 +18,14 @@ type player = {
 type level = { 
   mutable player : player; 
   mutable plot : plot
+}
+
+
+type windows_info = {
+    draw_area_widget : Widget.t;
+    draw_area : Sdl_area.t;
+    level : level;
+    mutable height : int ;
+    mutable width : int ;
+    label : Widget.t
 }

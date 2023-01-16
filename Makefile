@@ -11,7 +11,7 @@ run: build
 	
 launch : exec
 
-exec:
+exec: clean
 	dune exec DoomMetal $(ARGS)
 
 clean:
