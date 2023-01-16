@@ -25,8 +25,6 @@ let raycast level mouse_pos =
         y= if rayDir.y = 0. then 999. else Float.abs (1. /. rayDir.y);
     } in
     let step = {x=0.; y=0.} in
-    let hit = ref false in
-    let side = ref 0 in
 
     if rayDir.x < 0. then (
         step.x <- (-1.);
@@ -43,22 +41,27 @@ let raycast level mouse_pos =
         sideDist.y <- (map.y +. 1. -. pos.y) *. deltaDist.y;
     );
 
-    while not (!hit) do (
-        if sideDist.x < sideDist.y then (
+    let rec aux (hit:bool) side = (
+        if hit then hit, side else
+        let side = (
+            if sideDist.x < sideDist.y then (
             sideDist.x <- sideDist.x +. deltaDist.x;
             map.x <- map.x +. step.x;
-            side := 0;
-        ) else (
-            sideDist.y <- sideDist.y +. deltaDist.y;
-            map.y <- map.y +. step.y;
-            side := 1;
-        );
-        if (plot.(int_of_float map.x).(int_of_float map.y) <> NOTHING) then hit := true;
-    ) done;
+            0
+            ) else (
+                sideDist.y <- sideDist.y +. deltaDist.y;
+                map.y <- map.y +. step.y;
+             1
+            )
+        ) in
+        let hit = plot.(int_of_float map.x).(int_of_float map.y) <> NOTHING in
+        aux hit side;
+    ) in
+    let (hit, side) = aux false 0 in
 
     let perpWallDist = (
-        if !side == 0 then (sideDist.x -. deltaDist.x)
+        if side == 0 then (sideDist.x -. deltaDist.x)
         else (sideDist.y -. deltaDist.y);
     ) in
 
-    (!hit, perpWallDist, map)
+    (hit, perpWallDist, map)
