@@ -36,10 +36,10 @@ let bind_default_events windows_info level  = (
             update_player (Float.neg x_change) (Float.neg y_change) 0;
         );
         if keystates.{get_scancode_from_key (K.d)} <> 0 then (
-            update_player (Float.neg x_change) y_change 0;
+            update_player (Float.neg y_change) x_change 0;
         );
         if keystates.{get_scancode_from_key (K.q)} <> 0 then (
-            update_player x_change (Float.neg y_change) 0;
+            update_player y_change (Float.neg x_change) 0;
         );
 
         if keystates.{get_scancode_from_key (K.right)} <> 0 then (
