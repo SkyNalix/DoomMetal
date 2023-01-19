@@ -22,10 +22,23 @@ type level = {
 
 
 type windows_info = {
-    draw_area_widget : Widget.t;
-    draw_area : Sdl_area.t;
+    area3D_widget : Widget.t;
+    area3D : Sdl_area.t;
+    area2D_widget : Widget.t;
+    area2D : Sdl_area.t;
     level : level;
     mutable height : int ;
     mutable width : int ;
-    label : Widget.t
+    mutable block_height : int;
+    mutable block_width : int;
+}
+
+type ray = {
+  rayTouched : bool;
+  distance: float; 
+  touched_pos : position;
+  angle : int;
+  angle_vec : position; (*vecteur de l'angle où le joueur regarde*)
+  angle_min : int;
+  angle_max : int;
 }

@@ -13,6 +13,7 @@ depends: [
   "ocaml"
   "dune" {>= "3.0"}
   "bogue"
+  "odoc" {with-doc}
 ]
 build: [
   ["dune" "subst"] {dev}
@@ -25,6 +26,7 @@ build: [
     jobs
     "@install"
     "@runtest" {with-test}
+    "@doc" {with-doc}
   ]
 ]
 dev-repo: "git+https://github.com/username/reponame.git"

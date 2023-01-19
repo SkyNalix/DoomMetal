@@ -13,19 +13,16 @@ module S = Style
 let windows_info = Common.make_default_windows_info ();;
 
 let main () =
-    (* let level = Level.empty () in
-    Drawer2D.drawLevel windows_info level ;
-    let layout = L.flat_of_w ~scale_content:false [windows_info.draw_area_widget] in
+    let level = Level.empty () in
+    let layout = L.flat_of_w 
+        ~background:(L.opaque_bg Draw.grey)
+        [windows_info.area3D_widget; windows_info.area2D_widget] in
+    Raycasting.raycast windows_info level;
     let events = Common.bind_default_events windows_info level in
     let board = Bogue.of_layout ~connections:events layout in
-    Bogue.run board; *)
+    Bogue.run board;
     ();;
 
 let () = 
-    if Array.length Sys.argv > 1 then (
-        Array.iter (fun v -> Printf.printf "%s\n" v) Sys.argv;
-        Tester.run_test windows_info
-    ) else (
-        main ();
-        Bogue.quit ()
-    );;
+    main ();
+    Bogue.quit ()

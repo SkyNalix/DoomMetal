@@ -12,6 +12,28 @@ let color_of_wall = function
     | REDWALL -> Draw.red
     | _ -> Draw.black;;
 
+let drawRay windows_info level ray = 
+    
+    if not ray.rayTouched then () else
+
+    let player = level.player in
+
+    let player_posX = int_of_float (float_of_int windows_info.block_width *. player.pos.x) in
+    let player_posY = int_of_float (float_of_int windows_info.block_height *. player.pos.y) in
+    A.draw_line windows_info.area2D
+        ~color:(Draw.opaque Draw.grey)
+        ~thick:2
+        (int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
+        (player_posX, player_posY);
+
+    A.fill_rectangle windows_info.area2D 
+        ~color:(Draw.opaque Draw.blue)
+        ~w:(windows_info.block_width)
+        ~h:(windows_info.block_height)
+        ((int_of_float ray.touched_pos.x)*windows_info.block_width, 
+            (int_of_float ray.touched_pos.y)*windows_info.block_height);
+    ();;
+
 let drawLevel windows_info level : unit = 
     let plot : tile array array = level.plot in
     let player = level.player.pos in
@@ -21,14 +43,8 @@ let drawLevel windows_info level : unit =
     let plot_width = Array.length plot.(0) in
     let plot_height = Array.length plot in
 
-    A.fill_rectangle windows_info.draw_area
-        ~color:(Draw.opaque Draw.black)
-        ~w:windows_info.width
-        ~h:windows_info.height
-        (0,0);
-
     let rec drawPlot y x : unit =
-        A.fill_rectangle windows_info.draw_area 
+        A.fill_rectangle windows_info.area2D 
             ~color:(Draw.opaque (color_of_wall plot.(y).(x))) 
             ~w:(block_width)
             ~h:(block_height)
@@ -45,7 +61,7 @@ let drawLevel windows_info level : unit =
         let x2 = ((int_of_float (x_decimal *. 100.))*block_width)/100 in
         let y2 = ((int_of_float (y_decimal *. 100.))*block_height)/100 in
     
-        A.fill_circle windows_info.draw_area 
+        A.fill_circle windows_info.area2D 
         ~color:(Draw.opaque Draw.green) 
         ~radius:5
         (x_full*block_height + x2 ,
@@ -54,5 +70,5 @@ let drawLevel windows_info level : unit =
     in
 
     drawPlot 0 0 ;
-    drawPlayer () ;
+    drawPlayer ();
     ();;
