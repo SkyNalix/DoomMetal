@@ -26,7 +26,6 @@ type windows_info = {
     area3D : Sdl_area.t;
     area2D_widget : Widget.t;
     area2D : Sdl_area.t;
-    level : level;
     mutable height : int ;
     mutable width : int ;
     mutable block_height : int;

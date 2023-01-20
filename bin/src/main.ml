@@ -10,10 +10,10 @@ module S = Style
   github: https://github.com/sanette/bogue
 *)
 
-let windows_info = Common.make_default_windows_info ();;
 
 let main () =
-    let level = Level.empty () in
+    let level = Level.get "empty_level" in
+    let windows_info = Common.make_default_windows_info level in
     let layout = L.flat_of_w 
         ~background:(L.opaque_bg Draw.grey)
         [windows_info.area3D_widget; windows_info.area2D_widget] in
@@ -25,4 +25,5 @@ let main () =
 
 let () = 
     main ();
-    Bogue.quit ()
+    Bogue.quit ();
+    ();;

@@ -1,3 +1,6 @@
+(copy_files# src/*)
+(copy_files# rsc/*)
+
 (executable
  (public_name DoomMetal)
  (name main)

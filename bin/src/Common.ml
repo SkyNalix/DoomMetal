@@ -68,7 +68,7 @@ let bind_default_events windows_info level  = (
 );;
   
 
-let make_default_windows_info () : windows_info = (
+let make_default_windows_info level : windows_info = (
     let makearea () = W.sdl_area ~w:500 ~h:500 
         ~style: (
             S.create 
@@ -78,13 +78,11 @@ let make_default_windows_info () : windows_info = (
         () in
     let area3D_widget = makearea () in
     let area2D_widget = makearea () in
-    let level = Level.empty () in
     {
         area3D_widget = area3D_widget;
         area3D = W.get_sdl_area area3D_widget;
         area2D_widget = area2D_widget;
         area2D = W.get_sdl_area area2D_widget;
-        level = level;
         height = 500 ;
         width = 500 ;
         block_width = 500 / (Array.length level.plot.(0));

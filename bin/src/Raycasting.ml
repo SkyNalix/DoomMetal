@@ -56,6 +56,7 @@ let raycast_on_angle level mouse_pos =
             )
         ) in
         let hit = plot.(int_of_float map.x).(int_of_float map.y) <> NOTHING in
+
         aux hit side;
     ) in
     let (hit, side) = aux false 0 in
