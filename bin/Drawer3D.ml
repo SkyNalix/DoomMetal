@@ -7,7 +7,7 @@ module A = Sdl_area
 module S = Style
 
 
-let drawRay windows_info level ray i = 
+let drawRay windows_info level ray = 
     
     if not (ray.rayTouched) then (failwith "ray not touched") else
 
