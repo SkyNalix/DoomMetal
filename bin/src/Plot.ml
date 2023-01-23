@@ -10,7 +10,8 @@ let tile_of_char c =
     match c with
     | '0' -> NOTHING
     | '1' -> WALL
-    | '2' -> REDWALL
+    | '2' -> RED_WALL
+    | '3' -> TRANSPARENT_WALL
     | _ -> failwith "unidenfied char";;
 
 let parsePlot path = 

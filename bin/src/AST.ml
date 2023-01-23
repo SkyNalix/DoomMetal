@@ -1,9 +1,10 @@
 open Bogue
 
 type tile = 
-  | WALL
-  | REDWALL
   | NOTHING
+  | WALL
+  | RED_WALL
+  | TRANSPARENT_WALL
 
 type plot = tile array array
 

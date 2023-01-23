@@ -55,7 +55,8 @@ let raycast_on_angle level mouse_pos =
              1
             )
         ) in
-        let hit = plot.(int_of_float map.x).(int_of_float map.y) <> NOTHING in
+        let tile = plot.(int_of_float map.x).(int_of_float map.y) in
+        let hit = tile <> NOTHING && tile <> TRANSPARENT_WALL in
 
         aux hit side;
     ) in

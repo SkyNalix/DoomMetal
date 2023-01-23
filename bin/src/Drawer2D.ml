@@ -9,7 +9,7 @@ module S = Style
 
 let color_of_wall = function
     | WALL -> Draw.white
-    | REDWALL -> Draw.red
+    | RED_WALL -> Draw.red
     | _ -> Draw.black;;
 
 let drawRay windows_info level ray = 
@@ -44,11 +44,13 @@ let drawLevel windows_info level : unit =
     let plot_height = Array.length plot in
 
     let rec drawPlot y x : unit =
+        let tile = plot.(y).(x) in
+        let color = if tile = TRANSPARENT_WALL then Draw.green else color_of_wall tile in  
         A.fill_rectangle windows_info.area2D 
-            ~color:(Draw.opaque (color_of_wall plot.(y).(x))) 
-            ~w:(block_width)
-            ~h:(block_height)
-            (x*block_width, y*block_height);
+        ~color:(Draw.opaque color) 
+        ~w:(block_width)
+        ~h:(block_height)
+        (x*block_width, y*block_height);
         let (y,x) = if x >= plot_width-1 then (y+1,0) else (y,x+1) in
         if y >= plot_height then () else drawPlot y x
     in
