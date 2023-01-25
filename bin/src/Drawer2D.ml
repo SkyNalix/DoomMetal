@@ -19,19 +19,27 @@ let drawRay windows_info level ray =
     let player = level.player in
 
     let player_posX = int_of_float (float_of_int windows_info.block_width *. player.pos.x) in
-    let player_posY = int_of_float (float_of_int windows_info.block_height *. player.pos.y) in
+    let player_posY = int_of_float (float_of_int windows_info.block_height *. player.pos.y) in    
+    
+    A.fill_rectangle windows_info.area2D 
+        ~color:(Draw.opaque Draw.blue)
+        ~w:(windows_info.block_width)
+        ~h:(windows_info.block_height)
+        ((int_of_float ray.touched_pos.x)*windows_info.block_width, 
+        (int_of_float ray.touched_pos.y)*windows_info.block_height);
+
     A.draw_line windows_info.area2D
         ~color:(Draw.opaque Draw.grey)
         ~thick:2
         (int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
         (player_posX, player_posY);
 
-    A.fill_rectangle windows_info.area2D 
-        ~color:(Draw.opaque Draw.blue)
-        ~w:(windows_info.block_width)
-        ~h:(windows_info.block_height)
-        ((int_of_float ray.touched_pos.x)*windows_info.block_width, 
-            (int_of_float ray.touched_pos.y)*windows_info.block_height);
+    A.fill_circle windows_info.area2D
+        ~color:(Draw.opaque Draw.yellow)
+        ~radius:4
+        (int_of_float (ray.intersection.x *. (float_of_int windows_info.block_width)), 
+            int_of_float (ray.intersection.y *. (float_of_int windows_info.block_height)));
+        
     ();;
 
 let drawLevel windows_info level : unit = 

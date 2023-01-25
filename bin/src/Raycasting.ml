@@ -41,7 +41,7 @@ let raycast_on_angle level mouse_pos =
         step.y <- 1.;
         sideDist.y <- (map.y +. 1. -. pos.y) *. deltaDist.y;
     );
-
+    
     let rec aux (hit:bool) side = (
         if hit then hit, side else
         let side = (
@@ -67,7 +67,12 @@ let raycast_on_angle level mouse_pos =
         else (sideDist.y -. deltaDist.y);
     ) in
 
-    (hit, perpWallDist, map);;
+    let intersection = {
+        x=(player_pos.x +. (rayDir.x *. perpWallDist));
+        y=(player_pos.y +. (rayDir.y *. perpWallDist))
+    } in
+
+    (hit, perpWallDist, map, intersection);;
 
 
 let aux_raycast windows_info level angle angle_min angle_max =
@@ -85,11 +90,12 @@ let aux_raycast windows_info level angle angle_min angle_max =
 
     (* positions de la souris relativement dans le plot *)
     let mouse_pos = {x=viewVect.x /. float_of_int block_width; y=viewVect.y /. float_of_int block_height} in
-    let (a,b,c) = raycast_on_angle level mouse_pos in
+    let (a,b,c,d) = raycast_on_angle level mouse_pos in
     {
         rayTouched = a;
         distance = b; 
         touched_pos = c;
+        intersection = d;
         angle = angle;
         angle_vec = viewVect;
         angle_min = angle_min;

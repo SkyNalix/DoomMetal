@@ -2,3 +2,12 @@ nom, prenom, email
 Tazouev Arbi, tazouev.arbi@gmail.com
 Guinet Virgile, virgile.guinet@gmail.com
 projet: DoomMetal
+
+<15/12/2022>
+Jeu style doom en OCAML
+FAIT : 
+  - trouve librairie "bogue" de rendu grahique 2d (interface pour SDL2)
+  - code pour expérimenter (affichage d'un rectangle)
+À FAIRE:
+  - démo en 2D vue de dessus pour le raycasting
+  
