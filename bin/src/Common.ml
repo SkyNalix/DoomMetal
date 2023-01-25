@@ -30,16 +30,40 @@ let bind_default_events windows_info level  = (
 
         let keystates = get_keyboard_state () in
         if keystates.{get_scancode_from_key (K.z)} <> 0 then (
-            update_player x_change y_change 0;
+            let nouveauY = int_of_float((level.player.pos.y -. 0.1)) in
+            let nouveauX = int_of_float(level.player.pos.x) in
+
+            let tuile = level.plot.(nouveauX).(nouveauY) in
+            match tuile with 
+            |NOTHING ->update_player 0. (-0.1) 0 ;
+            |_ -> update_player 0. 0. 0;
         );
         if keystates.{get_scancode_from_key (K.s)} <> 0 then (
-            update_player (Float.neg x_change) (Float.neg y_change) 0;
+            let nouveauY = int_of_float((level.player.pos.y +. 0.1)) in
+            let nouveauX = int_of_float(level.player.pos.x) in
+
+            let tuile = level.plot.(nouveauX).(nouveauY) in
+            match tuile with 
+            |NOTHING -> update_player 0. (+0.1) 0 ;
+            |_ -> update_player 0. 0. 0;
         );
         if keystates.{get_scancode_from_key (K.d)} <> 0 then (
-            update_player (Float.neg y_change) x_change 0;
+            let nouveauY = int_of_float((level.player.pos.y )) in
+            let nouveauX = int_of_float(level.player.pos.x +. 0.1) in
+
+            let tuile = level.plot.(nouveauX).(nouveauY) in
+            match tuile with 
+            |NOTHING -> update_player (+0.1) 0. 0 ;
+            |_ -> update_player 0. 0. 0;
         );
         if keystates.{get_scancode_from_key (K.q)} <> 0 then (
-            update_player y_change (Float.neg x_change) 0;
+            let nouveauY = int_of_float((level.player.pos.y )) in
+            let nouveauX = int_of_float(level.player.pos.x -. 0.1) in
+
+            let tuile = level.plot.(nouveauX).(nouveauY) in
+            match tuile with 
+            |NOTHING -> update_player (-0.1) 0. 0 ;
+            |_ -> update_player 0. 0. 0;
         );
 
         if keystates.{get_scancode_from_key (K.right)} <> 0 then (
