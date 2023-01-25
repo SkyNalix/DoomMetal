@@ -11,3 +11,24 @@ FAIT :
 À FAIRE:
   - démo en 2D vue de dessus pour le raycasting
   
+  
+<25/02/2023>
+Degorre
+
+Fait :
+- démo 2D et 3D avec ray casting (rayons 2D mais affichage 3D)
+- effet fisheye, obscurcissement avec la profondeur
+- début d'implémentation des collisions (encore quelques problèmes)
+- début gestion des textures (avec quelques bugs)
+
+-> objectif de février/début mars dépassé !
+
+Faire :
+- corriger bugs (collisions et textures)
+- projectiles et ennemis
+
+
+Question (AD) : avec les objectifs actuels, n'allez-vous pas fini le projet trop tôt ?
+
+
+
