@@ -8,7 +8,6 @@ type tile =
 
 type plot = tile array array
 
-type intPosition = { mutable x : int; mutable y : int }
 type position = { mutable x : float; mutable y : float }
 
 type player = {
@@ -37,6 +36,7 @@ type ray = {
   rayTouched : bool;
   distance: float; 
   touched_pos : position;
+  intersection : position;
   angle : int;
   angle_vec : position; (*vecteur de l'angle où le joueur regarde*)
   angle_min : int;
