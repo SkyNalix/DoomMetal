@@ -1,7 +1,0 @@
-(copy_files# ../src/*)
-(copy_files# ../resources/*)
-
-(executable
- (public_name DoomMetal)
- (name main)
- (libraries DoomMetal bogue camlimages.png ))

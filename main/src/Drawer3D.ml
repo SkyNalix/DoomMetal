@@ -7,7 +7,7 @@ module A = Sdl_area
 module S = Style
 
 open Images
-let img = match (Png.load_as_rgb24 "bin/rsc/wolftextures.png" []) with
+let img = match (Png.load_as_rgb24 "main/resources/wolftextures.png" []) with
     | Rgb24 img -> img
     | _ -> failwith "impossible";;
 

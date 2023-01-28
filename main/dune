@@ -1,0 +1,11 @@
+(copy_files# src/*)
+(copy_files# resources/*)
+
+(executable
+  (public_name DoomMetal)
+  (name main)
+  (libraries bogue camlimages.png)
+)
+
+
+(env (dev (flags (:standard -warn-error -A -w -9 -w -32))))
