@@ -4,20 +4,12 @@ module W = Widget
 module A = Sdl_area
 
 (* Define a function to perform the raycast *)
-let raycast_on_angle level mouse_pos =
+let raycast_on_angle level rayDir =
     let plot = level.plot in
     let player_pos = level.player.pos in
 
     let pos = {x=player_pos.x; y=player_pos.y} in
 
-    let rayDir = (
-      let vec_x = mouse_pos.x -. player_pos.x in
-      let vec_y = mouse_pos.y -. player_pos.y in
-      let vec_length = sqrt (vec_x *. vec_x +. vec_y *. vec_y) in
-      {
-        x=(vec_x /. vec_length); y=(vec_y /. vec_length)
-      }
-    ) in
 
     let map = {x=float_of_int (int_of_float pos.x); y= float_of_int (int_of_float pos.y)} in
     let sideDist = {x=0.; y=0.} in
@@ -55,7 +47,7 @@ let raycast_on_angle level mouse_pos =
              1
             )
         ) in
-        let tile = plot.(int_of_float map.x).(int_of_float map.y) in
+        let tile = plot.(int_of_float map.y).(int_of_float map.x) in
         let hit = tile <> NOTHING && tile <> TRANSPARENT_WALL in
 
         aux hit side;
@@ -89,13 +81,22 @@ let aux_raycast windows_info level angle angle_min angle_max =
     viewVect.y <- (viewVect.y *. (float_of_int height) +. (float_of_int block_height *. player.pos.y ));
 
     (* positions de la souris relativement dans le plot *)
-    let mouse_pos = {x=viewVect.x /. float_of_int block_width; y=viewVect.y /. float_of_int block_height} in
-    let (a,b,c,d) = raycast_on_angle level mouse_pos in
+    let rayDir = {x=viewVect.x /. float_of_int block_width; y=viewVect.y /. float_of_int block_height} in
+    let rayDir = (
+      let vec_x = rayDir.x -. player.pos.x in
+      let vec_y = rayDir.y -. player.pos.y in
+      let vec_length = sqrt (vec_x *. vec_x +. vec_y *. vec_y) in
+      {
+        x=(vec_x /. vec_length); y=(vec_y /. vec_length)
+      }
+    ) in
+    let (rayTouched,distance,touched_pos,intersection) 
+        = raycast_on_angle level rayDir in
     {
-        rayTouched = a;
-        distance = b; 
-        touched_pos = c;
-        intersection = d;
+        rayTouched = rayTouched;
+        distance = distance; 
+        touched_pos = touched_pos;
+        intersection = intersection;
         angle = angle;
         angle_vec = viewVect;
         angle_min = angle_min;

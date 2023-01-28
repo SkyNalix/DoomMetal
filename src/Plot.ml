@@ -15,7 +15,7 @@ let tile_of_char c =
     | _ -> failwith "unidenfied char";;
 
 let parsePlot path = 
-    let ic = open_in ("bin/rsc/" ^ path) in
+    let ic = open_in ("resources/" ^ path) in
     let player_pos_str = input_line ic in
     let l = String.split_on_char ';' player_pos_str in
     if List.length l <> 2 then failwith (
