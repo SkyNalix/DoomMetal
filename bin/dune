@@ -4,4 +4,4 @@
 (executable
  (public_name DoomMetal)
  (name main)
- (libraries DoomMetal bogue))
+ (libraries DoomMetal bogue camlimages.png ))
