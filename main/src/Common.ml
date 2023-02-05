@@ -68,6 +68,23 @@ let bind_default_events windows_info level  = (
 );;
   
 
+let parameters = 
+    let open AST in
+    let args : parameters = {
+        debug = false;
+        textured = false;
+    } in
+    Array.fold_left
+    (fun args arg -> 
+        match arg with
+        | "--debug" ->
+            {args with debug=true}
+        | "--textured" ->
+            {args with textured=true}
+        | _ -> args
+        )
+    args
+    Sys.argv
 let make_default_windows_info level : windows_info = (
     let makearea () = W.sdl_area ~w:500 ~h:500 
         ~style: (
@@ -79,6 +96,7 @@ let make_default_windows_info level : windows_info = (
     let area3D_widget = makearea () in
     let area2D_widget = makearea () in
     {
+        parameters = parameters;
         area3D_widget = area3D_widget;
         area3D = W.get_sdl_area area3D_widget;
         area2D_widget = area2D_widget;

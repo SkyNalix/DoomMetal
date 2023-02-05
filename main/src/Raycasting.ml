@@ -67,7 +67,7 @@ let raycast_on_angle level rayDir =
     (hit, perpWallDist, map, intersection);;
 
 
-let aux_raycast windows_info level angle angle_min angle_max =
+let aux_raycast windows_info level angle angle_min angle_max angle_step =
 
     let width= windows_info.width in
     let height = windows_info.height in
@@ -101,12 +101,13 @@ let aux_raycast windows_info level angle angle_min angle_max =
         angle_vec = viewVect;
         angle_min = angle_min;
         angle_max = angle_max;
+        angle_step = angle_step
     };;
 
 
 
 let rec raycast_rec windows_info level (angle_min:int) (angle_max:int) (step:int) cur_angle =
-    let ray = aux_raycast windows_info level cur_angle angle_min angle_max in
+    let ray = aux_raycast windows_info level cur_angle angle_min angle_max step in
     if cur_angle = angle_max then [ray] else
     let cur_angle = min angle_max (cur_angle+step) in
     ray :: (raycast_rec windows_info level angle_min angle_max step cur_angle)
