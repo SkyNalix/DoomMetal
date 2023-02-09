@@ -10,4 +10,5 @@ exec: build
 	./DoomMetal 
 
 clean:
+	rm -f DoomMetal
 	dune clean

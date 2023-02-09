@@ -114,9 +114,14 @@ let rec raycast_rec windows_info level (angle_min:int) (angle_max:int) (step:int
 
 
 let raycast windows_info level = 
+
     let angle = level.player.view_angle in
     let rays = raycast_rec windows_info level (angle-25) (angle+25) 1 (angle-25) in
     List.iter (fun ray -> Drawer3D.drawRay windows_info level ray) rays;
+    Sdl_area.update windows_info.area3D;
+
     Drawer2D.drawLevel windows_info level;
     List.iter (fun ray -> Drawer2D.drawRay windows_info level ray) rays;
+    Sdl_area.update windows_info.area2D;
+
     ();;

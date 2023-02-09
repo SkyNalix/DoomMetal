@@ -6,13 +6,13 @@ module T = Trigger
 module A = Sdl_area
 module S = Style
 
-(*
+
 open Images
-let img = match (Png.load_as_rgb24 "main/resources/wolftextures.png" []) with
+let img = match (Jpeg.load "main/resources/wolftextures32.jpg" []) with
     | Rgb24 img -> img
-    | _ -> failwith "impossible";;
-let img = Rgb24.sub img 0 0 64 64;;
-*)
+    | _ -> failwith "image not Rgb24";;
+let img = Rgb24.sub img 0 0 32 32;;
+
 
 let texture_to_ty = function
 | NOTHING -> failwith "no texture for NOTHING"
@@ -36,13 +36,13 @@ let drawRay windows_info level ray =
     let rec_start_Y = windows_info.height/2 - rect_height/2 in
 
     if not windows_info.parameters.textured then (
-    A.fill_rectangle 
-        windows_info.area3D
-        ~color:(Draw.opaque (Drawer2D.color_of_wall level.plot.
-                    (int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x)))
-        ~w:(win_step)
-        ~h:(rect_height)
-        (rec_start_X, rec_start_Y);
+        A.fill_rectangle 
+            windows_info.area3D
+            ~color:(Draw.opaque (Drawer2D.color_of_wall level.plot.
+                        (int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x)))
+            ~w:(win_step)
+            ~h:(rect_height)
+            (rec_start_X, rec_start_Y);
     ) else
 
     let intersect_x = 
@@ -63,39 +63,13 @@ let drawRay windows_info level ray =
         else
             tmp mod 32
     in
-    if windows_info.parameters.debug then
-        Printf.printf "----------------------------
-        Drawer3D texture debug
-            ray.angle_vec.x = %f
-            ray.angle_vec.y = %f
-            ray.intersection.x = %f
-            ray.intersection.y = %f
-            intersect_x = %f
-            intersect_y = %f
-            in_texture_intersection = %f
-            lineH = %d
-            ty_step = %f
-            tx = %d\n"
-            ray.angle_vec.x
-            ray.angle_vec.y
-            ray.intersection.x
-            ray.intersection.y
-            intersect_x
-            intersect_y
-            in_texture_intersection
-            lineH
-            ty_step
-            tx;
 
     let rec loopi i ty = 
         if i >= lineH-1 then () else
-        let tile_touched = level.plot.
-            (int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x) in
-        let y = (int_of_float ty+(32*texture_to_ty tile_touched))*32 + tx in
-        let c = if Textures.all_Textures.(y) = 1 then 40 else 255 in
+        let c = Rgb24.get img tx  (int_of_float ty) in
         A.fill_rectangle 
             windows_info.area3D
-            ~color:(c,c,c,255)
+            ~color:(c.r,c.g,c.b,255)
             ~w:(win_step)
             ~h:(1)
             (rec_start_X, rec_start_Y+i);
