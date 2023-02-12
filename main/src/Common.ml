@@ -1,10 +1,11 @@
 open AST
 
 
-let color_of_wall = function
-    | WALL -> (255,255,255)
-    | RED_WALL -> (255,0,0)
-    | _ -> (0,0,0);;
+
+let texture_of_wall = function
+    | WALL -> "white_bricks"
+    | RED_WALL -> "red_bricks"
+    | _ -> "cobblestone";;
 
 let update_player (level:level) x y view_angle : level =
     level.player <- {

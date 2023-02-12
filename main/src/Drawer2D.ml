@@ -1,5 +1,20 @@
 open AST
 
+
+let white = 255,255,255;;
+let black = 0,0,0;;
+let red = 255,0,0;;
+let blue = 0,0,255;;
+let grey = 105,105,105;;
+let green = 0,255,0;;
+let color_of_wall = function
+    | WALL -> white
+    | RED_WALL -> red
+    | TRANSPARENT_WALL -> green
+    | _ -> black;;
+
+
+
 let drawRay windows_info level ray = 
     
     if not ray.rayTouched then () else
@@ -9,35 +24,19 @@ let drawRay windows_info level ray =
     let player_posX = int_of_float (float_of_int windows_info.block_width *. player.pos.x) in
     let player_posY = int_of_float (float_of_int windows_info.block_height *. player.pos.y) in    
     
-    Sdlrender.set_draw_color windows_info.render ~rgb:(0,0,255) ~a:255 ;
+    Sdlrender.set_draw_color windows_info.render ~rgb:blue ~a:255 ;
     let rect = Sdlrect.make 
             ~pos:((int_of_float ray.touched_pos.x)*windows_info.block_width, 
                 (int_of_float ray.touched_pos.y)*windows_info.block_height)
             ~dims:(windows_info.block_width, windows_info.block_height) in
     Sdlrender.fill_rect windows_info.render rect;
 
-    let (r,g,b) = Draw.grey in
-    Sdlrender.set_draw_color windows_info.render ~rgb:(r,g,b) ~a:255 ;
+    Sdlrender.set_draw_color windows_info.render ~rgb:grey ~a:255 ;
     Sdlrender.draw_line2 
         windows_info.render
         ~p1:(int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
         ~p2:(player_posX, player_posY);
 
-    (*
-    A.fill_rectangle windows_info.area2D 
-        ~color:(Draw.opaque Draw.blue)
-        ~w:(windows_info.block_width)
-        ~h:(windows_info.block_height)
-        ((int_of_float ray.touched_pos.x)*windows_info.block_width, 
-        (int_of_float ray.touched_pos.y)*windows_info.block_height);
-
-    A.draw_line windows_info.area2D
-        ~color:(Draw.opaque Draw.grey)
-        ~thick:2
-        (int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
-        (player_posX, player_posY);
-    *)
-        
     ();;
 
 let drawLevel windows_info level : unit = 
@@ -51,9 +50,9 @@ let drawLevel windows_info level : unit =
 
     let rec drawPlot y x : unit =
         let tile = plot.(y).(x) in
-        let (r,g,b) = if tile = TRANSPARENT_WALL then Draw.green else color_of_wall tile in  
+        let color = color_of_wall tile in  
 
-        Sdlrender.set_draw_color windows_info.render ~rgb:(r,g,b) ~a:255 ;
+        Sdlrender.set_draw_color windows_info.render ~rgb:color ~a:255 ;
         let rect = Sdlrect.make 
                 ~pos:(x*block_width, y*block_height)
                 ~dims:(block_width, block_height) in
@@ -74,11 +73,6 @@ let drawLevel windows_info level : unit =
             windows_info.render (x_full*block_height + x2 ,
             y_full*block_width + y2);
 
-        (* A.fill_circle windows_info.area2D 
-        ~color:(Draw.opaque Draw.green) 
-        ~radius:5
-        (x_full*block_height + x2 ,
-         y_full*block_width + y2); *)
         ()
     in
 
