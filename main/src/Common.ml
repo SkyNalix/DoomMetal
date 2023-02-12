@@ -21,15 +21,13 @@ let parameters =
     let open AST in
     let args : parameters = {
         debug = false;
-        textured = false;
+        tmp = false;
     } in
     Array.fold_left
     (fun args arg -> 
         match arg with
         | "--debug" ->
             {args with debug=true}
-        | "--textured" ->
-            {args with textured=true}
         | _ -> args
         )
     args

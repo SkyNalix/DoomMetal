@@ -22,7 +22,7 @@ type level = {
 
 type parameters =  {
   debug : bool;
-  textured : bool;
+  tmp : bool (* ajouté pour eviter des warnings, a enlever apres ajout d'autres parametres *)
 }
 
 type windows_info = {
