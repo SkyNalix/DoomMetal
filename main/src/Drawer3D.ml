@@ -1,11 +1,4 @@
 open AST
-open Bogue
-module W = Widget
-module L = Layout
-module T = Trigger
-module A = Sdl_area
-module S = Style
-
 
 open Images
 let img = match (Jpeg.load "main/resources/wolftextures32.jpg" []) with
@@ -36,13 +29,15 @@ let drawRay windows_info level ray =
     let rec_start_Y = windows_info.height/2 - rect_height/2 in
 
     if not windows_info.parameters.textured then (
-        A.fill_rectangle 
-            windows_info.area3D
-            ~color:(Draw.opaque (Drawer2D.color_of_wall level.plot.
-                        (int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x)))
-            ~w:(win_step)
-            ~h:(rect_height)
-            (rec_start_X, rec_start_Y);
+        let c = Common.color_of_wall level.plot.
+            (int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x) in
+        Sdlrender.set_draw_color windows_info.render ~rgb:c ~a:255 ;
+
+        let rect = Sdlrect.make 
+                ~pos:(rec_start_X, rec_start_Y)
+                ~dims:(win_step, rect_height) in
+        Sdlrender.fill_rect windows_info.render rect;
+        ()
     ) else
 
     let intersect_x = 
@@ -67,12 +62,13 @@ let drawRay windows_info level ray =
     let rec loopi i ty = 
         if i >= lineH-1 then () else
         let c = Rgb24.get img tx  (int_of_float ty) in
-        A.fill_rectangle 
-            windows_info.area3D
-            ~color:(c.r,c.g,c.b,255)
-            ~w:(win_step)
-            ~h:(1)
-            (rec_start_X, rec_start_Y+i);
+        let c = (c.r, c.g, c.b) in 
+        Sdlrender.set_draw_color windows_info.render ~rgb:c ~a:255 ;
+
+        let rect = Sdlrect.make 
+                ~pos:(rec_start_X, rec_start_Y+i)
+                ~dims:(win_step, 1) in
+        Sdlrender.fill_rect windows_info.render rect;
 
         loopi (i+1) (ty +. ty_step)
         in 

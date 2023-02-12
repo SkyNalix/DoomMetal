@@ -4,7 +4,7 @@
 (executable
   (public_name DoomMetal)
   (name main)
-  (libraries bogue camlimages.jpeg)
+  (libraries tsdl camlimages.jpeg sdl2)
 )
 
 

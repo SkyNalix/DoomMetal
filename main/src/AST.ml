@@ -1,6 +1,5 @@
-open Bogue
-
 type tile = 
+
   | NOTHING
   | WALL
   | RED_WALL
@@ -28,10 +27,8 @@ type parameters =  {
 
 type windows_info = {
     parameters : parameters;
-    area3D_widget : Widget.t;
-    area3D : Sdl_area.t;
-    area2D_widget : Widget.t;
-    area2D : Sdl_area.t;
+    window : Sdlwindow.t;
+    render : Sdltype.renderer;
     mutable height : int ;
     mutable width : int ;
     mutable block_height : int;
