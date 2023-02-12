@@ -1,16 +1,19 @@
 open AST
-open Bogue
-module W = Widget
-module L = Layout
-module T = Trigger
-module A = Sdl_area
-module S = Style
 
 
+let white = 255,255,255;;
+let black = 0,0,0;;
+let red = 255,0,0;;
+let blue = 0,0,255;;
+let grey = 105,105,105;;
+let green = 0,255,0;;
 let color_of_wall = function
-    | WALL -> Draw.white
-    | RED_WALL -> Draw.red
-    | _ -> Draw.black;;
+    | WALL -> white
+    | RED_WALL -> red
+    | TRANSPARENT_WALL -> green
+    | _ -> black;;
+
+
 
 let drawRay windows_info level ray = 
     
@@ -21,25 +24,19 @@ let drawRay windows_info level ray =
     let player_posX = int_of_float (float_of_int windows_info.block_width *. player.pos.x) in
     let player_posY = int_of_float (float_of_int windows_info.block_height *. player.pos.y) in    
     
-    A.fill_rectangle windows_info.area2D 
-        ~color:(Draw.opaque Draw.blue)
-        ~w:(windows_info.block_width)
-        ~h:(windows_info.block_height)
-        ((int_of_float ray.touched_pos.x)*windows_info.block_width, 
-        (int_of_float ray.touched_pos.y)*windows_info.block_height);
+    Sdlrender.set_draw_color windows_info.render ~rgb:blue ~a:255 ;
+    let rect = Sdlrect.make 
+            ~pos:((int_of_float ray.touched_pos.x)*windows_info.block_width, 
+                (int_of_float ray.touched_pos.y)*windows_info.block_height)
+            ~dims:(windows_info.block_width, windows_info.block_height) in
+    Sdlrender.fill_rect windows_info.render rect;
 
-    A.draw_line windows_info.area2D
-        ~color:(Draw.opaque Draw.grey)
-        ~thick:2
-        (int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
-        (player_posX, player_posY);
+    Sdlrender.set_draw_color windows_info.render ~rgb:grey ~a:255 ;
+    Sdlrender.draw_line2 
+        windows_info.render
+        ~p1:(int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
+        ~p2:(player_posX, player_posY);
 
-    A.fill_circle windows_info.area2D
-        ~color:(Draw.opaque Draw.yellow)
-        ~radius:4
-        (int_of_float (ray.intersection.x *. (float_of_int windows_info.block_width)), 
-            int_of_float (ray.intersection.y *. (float_of_int windows_info.block_height)));
-        
     ();;
 
 let drawLevel windows_info level : unit = 
@@ -53,12 +50,13 @@ let drawLevel windows_info level : unit =
 
     let rec drawPlot y x : unit =
         let tile = plot.(y).(x) in
-        let color = if tile = TRANSPARENT_WALL then Draw.green else color_of_wall tile in  
-        A.fill_rectangle windows_info.area2D 
-        ~color:(Draw.opaque color) 
-        ~w:(block_width)
-        ~h:(block_height)
-        (x*block_width, y*block_height);
+        let color = color_of_wall tile in  
+
+        Sdlrender.set_draw_color windows_info.render ~rgb:color ~a:255 ;
+        let rect = Sdlrect.make 
+                ~pos:(x*block_width, y*block_height)
+                ~dims:(block_width, block_height) in
+        Sdlrender.fill_rect windows_info.render rect;
         let (y,x) = if x >= plot_width-1 then (y+1,0) else (y,x+1) in
         if y >= plot_height then () else drawPlot y x
     in
@@ -71,11 +69,10 @@ let drawLevel windows_info level : unit =
         let x2 = ((int_of_float (x_decimal *. 100.))*block_width)/100 in
         let y2 = ((int_of_float (y_decimal *. 100.))*block_height)/100 in
     
-        A.fill_circle windows_info.area2D 
-        ~color:(Draw.opaque Draw.green) 
-        ~radius:5
-        (x_full*block_height + x2 ,
-         y_full*block_width + y2);
+        Sdlrender.draw_point
+            windows_info.render (x_full*block_height + x2 ,
+            y_full*block_width + y2);
+
         ()
     in
 
