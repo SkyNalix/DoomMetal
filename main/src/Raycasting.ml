@@ -67,7 +67,7 @@ let raycast_on_angle level rayDir =
     (hit, perpWallDist, map, intersection);;
 
 
-let aux_raycast windows_info level angle angle_min angle_max =
+let aux_raycast windows_info level angle angle_min angle_max angle_step =
 
     let width= windows_info.width in
     let height = windows_info.height in
@@ -101,21 +101,27 @@ let aux_raycast windows_info level angle angle_min angle_max =
         angle_vec = viewVect;
         angle_min = angle_min;
         angle_max = angle_max;
+        angle_step = angle_step
     };;
 
 
 
 let rec raycast_rec windows_info level (angle_min:int) (angle_max:int) (step:int) cur_angle =
-    let ray = aux_raycast windows_info level cur_angle angle_min angle_max in
+    let ray = aux_raycast windows_info level cur_angle angle_min angle_max step in
     if cur_angle = angle_max then [ray] else
     let cur_angle = min angle_max (cur_angle+step) in
     ray :: (raycast_rec windows_info level angle_min angle_max step cur_angle)
 
 
 let raycast windows_info level = 
+
     let angle = level.player.view_angle in
     let rays = raycast_rec windows_info level (angle-25) (angle+25) 1 (angle-25) in
     List.iter (fun ray -> Drawer3D.drawRay windows_info level ray) rays;
+    Sdl_area.update windows_info.area3D;
+
     Drawer2D.drawLevel windows_info level;
     List.iter (fun ray -> Drawer2D.drawRay windows_info level ray) rays;
+    Sdl_area.update windows_info.area2D;
+
     ();;

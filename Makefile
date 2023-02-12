@@ -1,18 +1,14 @@
 .SILENT:
-ARGS= --profile release 
 
-all: build run
+all: build
 
 build:
-	dune build $(ARGS)
+	dune build
+	mv -f ./_build/default/main/main.exe ./DoomMetal
 
-run: build
-	./_build/install/default/bin/DoomMetal
-	
-launch : exec
-
-exec: clean
-	dune exec DoomMetal $(ARGS)
+exec: build
+	./DoomMetal 
 
 clean:
-	rm -rf _build
+	rm -f DoomMetal
+	dune clean

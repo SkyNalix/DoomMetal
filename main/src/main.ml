@@ -10,7 +10,6 @@ module S = Style
   github: https://github.com/sanette/bogue
 *)
 
-
 let main () =
     let level = Level.get "empty_level" in
     let windows_info = Common.make_default_windows_info level in

@@ -21,7 +21,13 @@ type level = {
 }
 
 
+type parameters =  {
+  debug : bool;
+  textured : bool;
+}
+
 type windows_info = {
+    parameters : parameters;
     area3D_widget : Widget.t;
     area3D : Sdl_area.t;
     area2D_widget : Widget.t;
@@ -41,4 +47,5 @@ type ray = {
   angle_vec : position; (*vecteur de l'angle où le joueur regarde*)
   angle_min : int;
   angle_max : int;
+  angle_step : int
 }
