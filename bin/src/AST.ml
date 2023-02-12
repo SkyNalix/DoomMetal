@@ -16,6 +16,12 @@ type player = {
   view_angle : int
 }
 
+type ennemi = {
+   posE : position ;
+   mutable nom : string ;
+   hp  : int  ref 
+}  
+
 type level = { 
   mutable player : player; 
   mutable plot : plot

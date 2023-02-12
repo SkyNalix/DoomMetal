@@ -11,6 +11,12 @@ let color_of_wall = function
     | WALL -> Draw.white
     | RED_WALL -> Draw.red
     | _ -> Draw.black;;
+    
+
+let  moblist = ref []   
+let booleanMob = ref false    
+
+
 
 let drawRay windows_info level ray = 
     
@@ -35,6 +41,33 @@ let drawRay windows_info level ray =
     ();;
 
 let drawLevel windows_info level : unit = 
+
+    if !booleanMob = false then (* Sinon on a un import cyclique*)
+    (
+        
+    let ennemi   = { posE = {x = 5.; y = 4.;}; nom = "ennemi1"; hp = ref 1; } in 
+    moblist := !moblist @ [ennemi]  ;
+
+    let ennemi2  = { posE = {x = 7.5; y = 7.5;}; nom = "ennemi2"; hp = ref 1; } in 
+    let ennemi3  = { posE = {x = 4.5; y = 3.5;}; nom = "ennemi3"; hp = ref 1; } in 
+    let ennemi4  = { posE = {x = 6.2; y = 3.3;}; nom = "ennemi4"; hp = ref 1; } in 
+    let ennemi5  = { posE = {x = 4.5; y = 2.5;}; nom = "ennemi5"; hp = ref 1; } in 
+    let ennemi6  = { posE = {x = 2.5; y = 7.5;}; nom = "ennemi6"; hp = ref 1; } in 
+    
+
+    
+    moblist := !moblist @ [ennemi2] ;
+    moblist := !moblist @ [ennemi3] ;
+    moblist := !moblist @ [ennemi4] ;
+    moblist := !moblist @ [ennemi5] ;
+    moblist := !moblist @ [ennemi6] ; 
+    
+    print_string("moblist Drawer2D : ");
+    print_int(List.length !moblist);
+    print_string("\n");
+
+    booleanMob := true; ) ;
+
     let plot : tile array array = level.plot in
     let player = level.player.pos in
 
@@ -71,6 +104,33 @@ let drawLevel windows_info level : unit =
         ()
     in
 
+    let rec drawEnnemi windows_info liste = 
+        match liste with 
+        | enn :: l -> 
+            if !(enn.hp) > 0 then (  
+
+            let x_full = int_of_float enn.posE.x in
+            let y_full = int_of_float enn.posE.y in
+
+
+
+            (*let x_decimal = enn.posE.x -. (float_of_int x_full) in 
+
+            let y_decimal = enn.posE.y -. (float_of_int y_full) in *)
+            let x2 = ((x_full*100)*block_width)/100 in
+            let y2 = ((y_full*100 )*block_height)/100 in
+
+            A.fill_circle windows_info.area2D 
+            ~color:(Draw.opaque Draw.magenta) 
+            ~radius:5
+            (x2,y2);
+            drawEnnemi windows_info l )
+        | [] -> ()
+        
+    in 
+
     drawPlot 0 0 ;
     drawPlayer ();
+    drawEnnemi windows_info !moblist; 
     ();;
+
