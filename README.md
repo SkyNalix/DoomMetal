@@ -1,6 +1,6 @@
 
-Ce projet utilise Bogue pour l'interface graphique, vous avez donc besoin de l'installer avec `opam install bogue`
+Ce projet utilise OcamlSDL2 pour l'interface graphique, vous avez donc besoin de l'installer avec `opam install ocamlsdl2`
 
-Pour build & lancer: `make`
-Pour lancer sans build: `make exec`
+Pour build: `make`
+Pour lancer: `./DoomMetal`
 Pour nettoyer les fichiers: `make clean`

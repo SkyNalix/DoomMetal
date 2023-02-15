@@ -8,7 +8,7 @@
  (name DoomMetal)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune bogue)
+ (depends ocaml dune tsdl sdl2)
  (tags
   (topics "to describe" your project)))
 
