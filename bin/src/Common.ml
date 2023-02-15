@@ -12,12 +12,17 @@ module S = Style
                 et : https://ocaml.org/p/tsdl/0.9.6/doc/Tsdl/Sdl/index.html#type-event_type   
      *)
 
-let myIntToFloat x = (* regarde si on doit arondir au supérieur ou inférieur*)
+let myIntToFloat x = (* regarde si on doit arondir au supérieur ou inférieur DANS CERTAIN CAS pour le déplacement*)
     let y = int_of_float(x) in 
     
     let z = x -. float_of_int(y) in 
-    if z >= 0.00 then y+1 else if z <= -0.1 then y-1 else y 
+    if z >= 0.05 then y+1 else if z <= -0.1 then y-1 else y 
 
+;;
+
+let floatToInt x = 
+    let sub = int_of_float(x) in 
+    if (x -. float_of_int(sub) >= 0.5 ) then sub+1 else sub 
 ;;
 
 let print_Position (pos : position)  (str : string) =
@@ -30,12 +35,16 @@ let print_Position (pos : position)  (str : string) =
 ;;
 
 let arrondir (x : float) (valeur : float ) =  (* -1 -0.6    *)
-    x +. 0.25 > valeur && x -. 0.25 < valeur
+    x +. 0.35 > valeur && x -. 0.35 < valeur
 ;;
 
 let toucheUnMur x y (level : level)=
-    let tx = myIntToFloat x in 
-    let ty = myIntToFloat y in 
+
+    
+    let tx = floatToInt x in 
+    let ty = floatToInt y in 
+    print_string("what's happening here ? : ") ; print_int( floatToInt x); print_string("\n");
+    
     let tuile = level.plot.(tx).(ty) in 
     match tuile with 
     | NOTHING -> print_string("NOTHING \n"); false 
@@ -45,25 +54,31 @@ let toucheUnMur x y (level : level)=
 let rec auxTire  y_change x_change (player : player) moblist py px level = (* mettre le x_change aussi*)
         
         
-        let rec aux y_change player liste  =
+        let rec aux player liste  =
                 match liste with
                 | enn  :: l ->  if (arrondir enn.posE.y py && arrondir enn.posE.x px   ) then (print_string("TOUCHER \n"); 
                         let aa : int ref = enn.hp in enn.hp := !aa -1; Drawer2D.moblist := List.filter (fun enn -> enn.hp > ref 0) !Drawer2D.moblist ; 
                 
                         () ) 
-                                else  aux y_change player l
+                                else (*print_Position enn.posE  "Ennemi :"; print_float(py); print_string("\n"); *) aux player l
 
                 | [] -> ()
         in
         
-        if (py < 8. && py > 0. && px > 0. && px < 8.  ) then (   aux y_change player moblist ; print_string(" methode \n \n"); auxTire y_change x_change  player moblist (py +. y_change) (px +. x_change) level )else(
-      
-      
+        print_float(px);
+        print_string(" ");
+        print_float(py);
+        print_string(" \n");
+
+        if (py < 8. && py > 0. && px > 0. && px < 8. && (toucheUnMur px py level) =false ) then (   aux player moblist ; auxTire y_change x_change  player moblist (py +. y_change) (px +. x_change) level )else(
+        (*print_Position player.pos "player : "; *) 
+
+        print_string(" \n FIN METHODE \n");   )
+
 ;;
 
 
 let bind_default_events windows_info level  = (
-
 
     let update_player x y view_angle =
         let a = myIntToFloat (level.player.pos.x +. x ) -1 in 
@@ -127,10 +142,15 @@ let bind_default_events windows_info level  = (
             update_player 0. 0. 15;
         );
         if keystates.{get_scancode_from_key (K.space)} <> 0 then (
+            print_string("tire \n");
+            
             auxTire y_change x_change level.player !Drawer2D.moblist level.player.pos.y level.player.pos.x level
         );
         () in
 
+        (*let ma_direction x y angle =
+            if angle <45 && angle > 0 
+        in *)
 
     let update_after_action f a b c = 
         A.clear windows_info.area3D; 
