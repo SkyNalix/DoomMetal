@@ -34,7 +34,9 @@ let drawRay windows_info level ray =
     Sdlrender.set_draw_color windows_info.render ~rgb:grey ~a:255 ;
     Sdlrender.draw_line2 
         windows_info.render
-        ~p1:(int_of_float ray.angle_vec.x, int_of_float ray.angle_vec.y)
+        ~p1:(
+            int_of_float (ray.angle_vec.x *. (float_of_int windows_info.block_width)), 
+            int_of_float (ray.angle_vec.y *. (float_of_int windows_info.block_height)))
         ~p2:(player_posX, player_posY);
 
     ();;
@@ -43,10 +45,10 @@ let drawLevel windows_info level : unit =
     let plot : tile array array = level.plot in
     let player = level.player.pos in
 
-    let block_width = (windows_info.width / (Array.length plot.(0))) in
-    let block_height = (windows_info.height / (Array.length plot)) in
-    let plot_width = Array.length plot.(0) in
-    let plot_height = Array.length plot in
+    let plot_width = int_of_float level.plot_width in
+    let plot_height = int_of_float level.plot_height in
+    let block_width = (windows_info.drawer2D_width / plot_width) in
+    let block_height = (windows_info.drawer2D_height / plot_height) in
 
     let rec drawPlot y x : unit =
         let tile = plot.(y).(x) in

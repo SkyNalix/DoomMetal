@@ -19,6 +19,11 @@ let texture_to_ty = function
 
 let drawRay windows_info level ray =
     if not (ray.rayTouched) then (failwith "ray not touched") else
+    
+    let width  = windows_info.drawer3D_width in
+    let height = windows_info.drawer3D_height in
+        
+
     let distance = (* fisheye fix *)
         let ca = ((float_of_int level.player.view_angle) -. (float_of_int ray.angle)) 
                     *. (Float.pi /. 180.0) in
@@ -27,10 +32,10 @@ let drawRay windows_info level ray =
             else if ca > (2. *. Float.pi) then ca -. 2. *. Float.pi 
             else ca in
         ray.distance *. cos(ca) in
-    let win_step = windows_info.width / ((ray.angle_max - ray.angle_min)/ray.angle_step) in 
-    let rect_height = (int_of_float ( float_of_int(windows_info.height) /. distance)) in
+    let win_step = width / ((ray.angle_max - ray.angle_min)/ray.angle_step) in 
+    let rect_height = (int_of_float ( float_of_int(height) /. distance)) in
     let rec_start_X = (ray.angle_max - ray.angle) * win_step in
-    let rec_start_Y = windows_info.height/2 - rect_height/2 in
+    let rec_start_Y = height/2 - rect_height/2 in
 
     let intersect_x = 
         let decimal = Float.floor ray.intersection.x in
@@ -58,7 +63,8 @@ let drawRay windows_info level ray =
         windows_info.render 
         ~texture:texture 
         ~src_rect:(Sdlrect.make ~pos:(tx,0) ~dims:(1,32))
-        ~dst_rect:(Sdlrect.make ~pos:(rec_start_X, rec_start_Y) ~dims:(win_step, rect_height))
+        ~dst_rect:(Sdlrect.make ~pos:(rec_start_X, rec_start_Y) 
+                    ~dims:(win_step, rect_height))
         ~angle:0.
         ();
     ();;

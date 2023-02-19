@@ -65,19 +65,18 @@ let raycast_on_angle level rayDir =
 
 let aux_raycast windows_info level angle angle_min angle_max angle_step =
 
-    let width= windows_info.width in
-    let height = windows_info.height in
+    let height = level.plot_height in
+    let width= level.plot_width in
+
     let player = level.player in
-    let block_width = windows_info.block_width in
-    let block_height = windows_info.block_height in
 
     let radians = (float_of_int angle) *. (Float.pi /. 180.) in
     let viewVect = { x=sin radians; y=cos radians} in
-    viewVect.x <- (viewVect.x *. (float_of_int width)  +. (float_of_int block_width *. player.pos.x ));
-    viewVect.y <- (viewVect.y *. (float_of_int height) +. (float_of_int block_height *. player.pos.y ));
+    viewVect.x <- (viewVect.x *. width  +. (player.pos.x ));
+    viewVect.y <- (viewVect.y *. height +. (player.pos.y ));
 
     (* positions de la souris relativement dans le plot *)
-    let rayDir = {x=viewVect.x /. float_of_int block_width; y=viewVect.y /. float_of_int block_height} in
+    let rayDir = {x=viewVect.x; y=viewVect.y} in
     let rayDir = (
       let vec_x = rayDir.x -. player.pos.x in
       let vec_y = rayDir.y -. player.pos.y in

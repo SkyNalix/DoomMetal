@@ -62,22 +62,23 @@ let () =
     let windows_info = Common.make_default_windows_info level in
     let fps = 1000/60 in
 
+    let draw_2D = windows_info.parameters.drawer2D in
+
     let update () = (
         Sdlrender.set_draw_color windows_info.render ~rgb:(0,0,0) ~a:255;
         Sdlrender.clear windows_info.render;
-        let rays = Raycasting.raycast windows_info level in
-        List.iter (fun ray -> Drawer3D.drawRay windows_info level ray) rays;
+
+        if draw_2D then (
+            Drawer2D.drawLevel windows_info level;
+            let rays = Raycasting.raycast windows_info level in
+            List.iter (fun ray -> Drawer2D.drawRay windows_info level ray) rays;
+        ) else (
+            let rays = Raycasting.raycast windows_info level in
+            List.iter (fun ray -> Drawer3D.drawRay windows_info level ray) rays;
+        );
+
         Sdlrender.render_present windows_info.render;
     ) in
-    
-    (* let update () = (
-        Sdlrender.set_draw_color windows_info.render ~rgb:(0,0,0) ~a:255;
-        Sdlrender.clear windows_info.render;
-        Drawer2D.drawLevel windows_info level;
-        let rays = Raycasting.raycast windows_info level in
-        List.iter (fun ray -> Drawer2D.drawRay windows_info level ray) rays;
-        Sdlrender.render_present windows_info.render;
-    ) in *)
 
     update ();
 

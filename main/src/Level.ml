@@ -6,5 +6,7 @@ let get s =
      pos = pos;
      view_angle = 180
   };
-  plot=plot
+  plot=plot;
+  plot_height = float_of_int (Array.length plot);
+  plot_width = float_of_int (Array.length plot.(0));
 };;
