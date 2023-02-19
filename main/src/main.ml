@@ -2,6 +2,26 @@ open AST
 
 open Sdlevent
 
+
+let print_mouse_motion_event e =
+    Printf.printf "
+  mouse_motion_event ((
+    timestamp: %ld
+    window_id: %lX
+    buttons: %s
+    x: %d
+    y: %d
+    xrel: %d
+    yrel: %d
+  ))\n%!"
+    e.mm_timestamp
+    e.mm_window_id
+    (String.concat " "
+      (List.map string_of_int e.mm_buttons))
+    e.mm_x
+    e.mm_y
+    e.mm_xrel
+    e.mm_yrel
 let proc_events (level:level) e : level = 
     let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
     let x_change = sin radians *. 0.1 in
@@ -24,6 +44,12 @@ let proc_events (level:level) e : level =
         Common.update_player level 0. 0. (15)
     | KeyDown { keycode = Sdlkeycode.Right } -> 
         Common.update_player level 0. 0. (-15)
+    
+    | Mouse_Motion e -> 
+        if e.mm_xrel < 0 then
+            Common.update_player level 0. 0. 1
+        else
+            Common.update_player level 0. 0. (-1)
     | Quit _ ->
         Sdl.quit ();
         exit 0
