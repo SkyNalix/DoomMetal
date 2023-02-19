@@ -5,10 +5,10 @@ let images =
     [
         ("white_bricks", Sdlsurface.load_bmp ~filename:(dir^"white_bricks.bmp"));
         ("red_bricks", Sdlsurface.load_bmp ~filename:(dir^"red_bricks.bmp"));
-        ("cobblestone", Sdlsurface.load_bmp ~filename:(dir^"cobblestone.bmp"));
-        ("door", Sdlsurface.load_bmp ~filename:(dir^"door.bmp"));
-        ("wooden_planks", Sdlsurface.load_bmp ~filename:(dir^"wooden_planks.bmp"));
-        ("purple_thing", Sdlsurface.load_bmp ~filename:(dir^"purple_thing.bmp"));
+        (* ("cobblestone", Sdlsurface.load_bmp ~filename:(dir^"cobblestone.bmp")); *)
+        (* ("door", Sdlsurface.load_bmp ~filename:(dir^"door.bmp")); *)
+        (* ("wooden_planks", Sdlsurface.load_bmp ~filename:(dir^"wooden_planks.bmp")); *)
+        (* ("purple_thing", Sdlsurface.load_bmp ~filename:(dir^"purple_thing.bmp")); *)
     ]
 
 let texture_to_ty = function
@@ -46,12 +46,12 @@ let drawRay windows_info level ray =
     let in_texture_intersection = intersect_y +. intersect_x in
 
     let tx = 
-        let tmp = int_of_float (in_texture_intersection *. 32.) in
+        let tmp = int_of_float (in_texture_intersection *. 64.) in
         if (ray.angle_vec.x < 0. && intersect_y <> 0.) ||
             (ray.angle_vec.y > 0. && intersect_x <> 0.) then
-            31-tmp mod 32
+            63-tmp mod 64
         else
-            tmp mod 32
+            tmp mod 64
     in
 
     let wall = level.plot.(int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x) in
@@ -62,7 +62,7 @@ let drawRay windows_info level ray =
     Sdlrender.copyEx 
         windows_info.render 
         ~texture:texture 
-        ~src_rect:(Sdlrect.make ~pos:(tx,0) ~dims:(1,32))
+        ~src_rect:(Sdlrect.make ~pos:(tx,0) ~dims:(1,64))
         ~dst_rect:(Sdlrect.make ~pos:(rec_start_X, rec_start_Y) 
                     ~dims:(win_step, rect_height))
         ~angle:0.
