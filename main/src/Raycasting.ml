@@ -63,21 +63,20 @@ let raycast_on_angle level rayDir =
     (hit, perpWallDist, map, intersection);;
 
 
-let aux_raycast windows_info level angle angle_min angle_max angle_step =
+let aux_raycast level angle angle_min angle_max angle_step =
 
-    let width= windows_info.width in
-    let height = windows_info.height in
+    let height = level.plot_height in
+    let width= level.plot_width in
+
     let player = level.player in
-    let block_width = windows_info.block_width in
-    let block_height = windows_info.block_height in
 
-    let radians = (float_of_int angle) *. (Float.pi /. 180.) in
+    let radians = angle *. (Float.pi /. 180.) in
     let viewVect = { x=sin radians; y=cos radians} in
-    viewVect.x <- (viewVect.x *. (float_of_int width)  +. (float_of_int block_width *. player.pos.x ));
-    viewVect.y <- (viewVect.y *. (float_of_int height) +. (float_of_int block_height *. player.pos.y ));
+    viewVect.x <- (viewVect.x *. width  +. (player.pos.x ));
+    viewVect.y <- (viewVect.y *. height +. (player.pos.y ));
 
     (* positions de la souris relativement dans le plot *)
-    let rayDir = {x=viewVect.x /. float_of_int block_width; y=viewVect.y /. float_of_int block_height} in
+    let rayDir = {x=viewVect.x; y=viewVect.y} in
     let rayDir = (
       let vec_x = rayDir.x -. player.pos.x in
       let vec_y = rayDir.y -. player.pos.y in
@@ -102,14 +101,19 @@ let aux_raycast windows_info level angle angle_min angle_max angle_step =
 
 
 
-let rec raycast_rec windows_info level (angle_min:int) (angle_max:int) (step:int) cur_angle =
-    let ray = aux_raycast windows_info level cur_angle angle_min angle_max step in
-    if cur_angle = angle_max then [ray] else
-    let cur_angle = min angle_max (cur_angle+step) in
-    ray :: (raycast_rec windows_info level angle_min angle_max step cur_angle)
+let rec raycast_rec level (angle_min:float) (angle_max:float) (step:float) (cur_angle:float) rays =
+    let ray = aux_raycast level cur_angle angle_min angle_max step in
+    let rays = ray :: rays in
+    if cur_angle = angle_max then rays else
+    let cur_angle = Float.min angle_max (cur_angle+.step) in
+    raycast_rec level angle_min angle_max step cur_angle rays
 
 
-let raycast windows_info level = 
-    let angle = level.player.view_angle in
-    raycast_rec windows_info level (angle-25) (angle+25) 1 (angle-25)
+let raycast level = 
+    let angle = float_of_int level.player.view_angle in
+    raycast_rec level (angle-.25.) (angle+.25.) 0.4 (angle-.25.) []
     ;;
+
+
+
+

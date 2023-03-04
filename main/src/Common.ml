@@ -21,13 +21,14 @@ let parameters =
     let open AST in
     let args : parameters = {
         debug = false;
-        tmp = false;
+        drawer2D = false;
     } in
     Array.fold_left
     (fun args arg -> 
         match arg with
         | "--debug" ->
             {args with debug=true}
+        | "--2D" -> {args with drawer2D=true}
         | _ -> args
         )
     args
@@ -41,33 +42,33 @@ let make_default_windows_info level : windows_info = (
       Sdlrender.create_window_and_renderer
         ~width ~height
         ~flags:[
-            (* Sdlwindow.FulldScreen *)
-            (* Sdlwindow.Mouse_Focus *)
-            (* Sdlwindow.OpenGL; *)
-            (* Sdlwindow.Shown; *)
-            (* Sdlwindow.Hidden; *)
-            (* Sdlwindow.Borderless; *)
-            (* Sdlwindow.Resizable; *)
-            (* Sdlwindow.Minimized; *)
-            (* Sdlwindow.Maximized; *)
-            (* Sdlwindow.Input_Grabbed; *)
-            (* Sdlwindow.Input_Focus; *)
-            (* Sdlwindow.Mouse_Focus; *)
-            (* Sdlwindow.FullScreen_Desktop; *)
-            (* Sdlwindow.Foreign; *)
+            Sdlwindow.Input_Grabbed;
+            Sdlwindow.Input_Focus;
+            Sdlwindow.Mouse_Focus;
+            Sdlwindow.FullScreen_Desktop;
       ]
     in
     ignore (window);
 
-    Sdlrender.set_draw_color render ~rgb:(0,0,0) ~a:255;
+    Sdlrender.set_draw_color render ~rgb:(120,120,120) ~a:255;
     Sdlrender.clear render;
+    Sdlmouse.show_cursor ~toggle:false;
+    let width, height = Sdlwindow.get_size window in
+    let drawer3D_height, drawer3D_width = height, width in
+    (* let drawer3D_height, drawer3D_width = height, min height width in *)
+    let drawer2D_height, drawer2D_width = height, min height width in
+
     {
         parameters = parameters;
         window = window;
         render = render;
-        height = 500 ;
-        width = 500 ;
-        block_width = 500 / (Array.length level.plot.(0));
-        block_height = 500 / (Array.length level.plot);
+        height = height;
+        width = width ;
+        drawer3D_height = drawer3D_height;
+        drawer3D_width = drawer3D_width;
+        drawer2D_height = drawer2D_height;
+        drawer2D_width = drawer2D_width;
+        block_width = drawer2D_width / (Array.length level.plot.(0));
+        block_height = drawer2D_height / (Array.length level.plot);
     }
 )

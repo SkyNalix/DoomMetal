@@ -16,23 +16,29 @@ type player = {
 
 type level = { 
   mutable player : player; 
-  mutable plot : plot
+  plot : plot;
+  plot_height : float;
+  plot_width : float;
 }
 
 
 type parameters =  {
   debug : bool;
-  tmp : bool (* ajouté pour eviter des warnings, a enlever apres ajout d'autres parametres *)
+  drawer2D : bool
 }
 
 type windows_info = {
     parameters : parameters;
     window : Sdlwindow.t;
     render : Sdltype.renderer;
-    mutable height : int ;
-    mutable width : int ;
-    mutable block_height : int;
-    mutable block_width : int;
+    height : int ;
+    width : int ;
+    drawer3D_height : int;
+    drawer3D_width : int;
+    drawer2D_height : int;
+    drawer2D_width : int;
+    block_height : int;
+    block_width : int;
 }
 
 type ray = {
@@ -40,9 +46,9 @@ type ray = {
   distance: float; 
   touched_pos : position;
   intersection : position;
-  angle : int;
+  angle : float;
   angle_vec : position; (*vecteur de l'angle où le joueur regarde*)
-  angle_min : int;
-  angle_max : int;
-  angle_step : int
+  angle_min : float;
+  angle_max : float;
+  angle_step : float
 }
