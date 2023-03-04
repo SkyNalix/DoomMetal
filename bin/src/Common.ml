@@ -77,6 +77,80 @@ let rec auxTire  y_change x_change (player : player) moblist py px level = (* me
 
 ;;
 
+let aporte (player:player) (ennemi : ennemi) = 
+    if ( player.pos.x >= ennemi.posE.x && player.pos.x <= ennemi.posE.x +. 1.5 
+        && player.pos.y >= ennemi.posE.y && player.pos.y <= ennemi.posE.y +. 1.5) then true 
+    else( if( player.pos.x <= ennemi.posE.x && player.pos.x >= ennemi.posE.x -. 1.5 
+        && player.pos.y <= ennemi.posE.y && player.pos.y >= ennemi.posE.y -. 1.5
+    )    then true 
+    else (if (player.pos.x >= ennemi.posE.x && player.pos.x <= ennemi.posE.x +. 1.5 &&
+        player.pos.y <= ennemi.posE.y && player.pos.y >= ennemi.posE.y -. 1.5 ) then true  
+    else (if (player.pos.x <= ennemi.posE.x && player.pos.x >= ennemi.posE.x -. 1.5 && 
+        player.pos.y >= ennemi.posE.y && player.pos.y <= ennemi.posE.y +. 1.5) then true else false   
+    ) ) ) 
+;;
+
+let deplacement (player:player) (ennemi : ennemi)  = (* Deplacement float = 0.05, déplacement map = 1 *)
+
+        if(player.pos.x >= ennemi.posE.x) then( 
+            ennemi.posE <- {
+                x = ennemi.posE.x +. 0.08;
+                y = ennemi.posE.y;
+            }; )
+            else ( 
+                ennemi.posE <- {
+                x = ennemi.posE.x -. 0.08;
+                y = ennemi.posE.y;
+            };
+            ) ;
+
+        if(player.pos.y >= ennemi.posE.y) then (
+            ennemi.posE <- {
+                x = ennemi.posE.x;
+                y = ennemi.posE.y +. 0.08;
+            };
+         )     
+        else (
+            ennemi.posE <- {
+                x = ennemi.posE.x;
+                y = ennemi.posE.y -. 0.08;
+            };
+        ) ;
+            
+            
+        print_float(player.pos.x);
+        print_string(" | ");
+        print_float(player.pos.x);
+        print_string(" \n");
+    
+        print_float(ennemi.posE.x);
+        print_string(" ");
+        print_float(ennemi.posE.x);
+        print_string(" \n");
+
+
+            ()
+
+;;
+
+
+let actionEnnemi (player : player) = 
+    
+    let see_Player player = (* Faire en sorte que les mob réagissent en cas de tir*)
+        
+        let rec aux liste = 
+            match liste with
+            | [] -> ()
+            | x :: l ->  
+                    if (aporte player x) then (print_string("deplacement \n"); deplacement player x; () )
+                    else print_string("pas vue \n"); ()
+            in 
+
+        aux !Drawer2D.moblist            
+    in
+
+    see_Player player;
+;;
 
 let bind_default_events windows_info level  = (
 
@@ -95,7 +169,7 @@ let bind_default_events windows_info level  = (
             };
             view_angle = (level.player.view_angle + view_angle) mod 360
         }; ()
-        |_ -> print_string("Autre \n"); ()
+        |_ ->  ()
         
 
         in
@@ -106,6 +180,7 @@ let bind_default_events windows_info level  = (
         let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
         let x_change = sin radians *. 0.1 in
         let y_change = cos radians *. 0.1 in 
+        actionEnnemi level.player; 
 
         let keystates = get_keyboard_state () in
         if keystates.{get_scancode_from_key (K.z)} <> 0 then (
@@ -117,22 +192,13 @@ let bind_default_events windows_info level  = (
             update_player (Float.neg x_change) (Float.neg y_change) 0;
         );
         if keystates.{get_scancode_from_key (K.d)} <> 0 then (
-            let nouveauY = int_of_float((level.player.pos.y )) in
-            let nouveauX = int_of_float(level.player.pos.x +. 0.1) in
 
-            let tuile = level.plot.(nouveauX).(nouveauY) in
-            match tuile with 
-            |NOTHING -> update_player (Float.neg y_change) x_change  0;
-            |_ -> update_player 0. 0. 0;
+
+            update_player (Float.neg y_change) x_change  0;
         );
         if keystates.{get_scancode_from_key (K.q)} <> 0 then (
-            let nouveauY = int_of_float((level.player.pos.y )) in
-            let nouveauX = int_of_float(level.player.pos.x -. 0.1) in
 
-            let tuile = level.plot.(nouveauX).(nouveauY) in
-            match tuile with 
-            |NOTHING -> update_player  y_change (Float.neg x_change) 0 ;
-            |_ -> update_player 0. 0. 0; 
+            update_player  y_change (Float.neg x_change) 0 ;
         );
 
         if keystates.{get_scancode_from_key (K.right)} <> 0 then (

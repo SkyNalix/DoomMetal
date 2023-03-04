@@ -12,19 +12,19 @@ type intPosition = { mutable x : int; mutable y : int }
 type position = { mutable x : float; mutable y : float }
 
 type player = {
-  pos : position;
+  mutable pos : position;
   view_angle : int
 }
 
 type ennemi = {
-   posE : position ;
+   mutable posE : position ;
    mutable nom : string ;
    hp  : int  ref 
 }  
 
 type level = { 
   mutable player : player; 
-  mutable plot : plot
+  mutable plot : plot ;
 }
 
 
