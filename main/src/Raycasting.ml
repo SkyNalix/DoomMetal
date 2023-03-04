@@ -70,7 +70,7 @@ let aux_raycast level angle angle_min angle_max angle_step =
 
     let player = level.player in
 
-    let radians = (float_of_int angle) *. (Float.pi /. 180.) in
+    let radians = angle *. (Float.pi /. 180.) in
     let viewVect = { x=sin radians; y=cos radians} in
     viewVect.x <- (viewVect.x *. width  +. (player.pos.x ));
     viewVect.y <- (viewVect.y *. height +. (player.pos.y ));
@@ -101,14 +101,19 @@ let aux_raycast level angle angle_min angle_max angle_step =
 
 
 
-let rec raycast_rec level (angle_min:int) (angle_max:int) (step:int) cur_angle =
+let rec raycast_rec level (angle_min:float) (angle_max:float) (step:float) (cur_angle:float) rays =
     let ray = aux_raycast level cur_angle angle_min angle_max step in
-    if cur_angle = angle_max then [ray] else
-    let cur_angle = min angle_max (cur_angle+step) in
-    ray :: (raycast_rec level angle_min angle_max step cur_angle)
+    let rays = ray :: rays in
+    if cur_angle = angle_max then rays else
+    let cur_angle = Float.min angle_max (cur_angle+.step) in
+    raycast_rec level angle_min angle_max step cur_angle rays
 
 
 let raycast level = 
-    let angle = level.player.view_angle in
-    raycast_rec level (angle-25) (angle+25) 1 (angle-25)
+    let angle = float_of_int level.player.view_angle in
+    raycast_rec level (angle-.25.) (angle+.25.) 0.4 (angle-.25.) []
     ;;
+
+
+
+

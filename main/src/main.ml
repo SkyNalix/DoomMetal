@@ -57,7 +57,6 @@ let proc_events (level:level) e : level =
 
 
 let () =
-
     let level = Level.get "empty_level" in
     let windows_info = Common.make_default_windows_info level in
     let fps = 1000/60 in
@@ -67,21 +66,22 @@ let () =
     let update () = (
         Sdlrender.set_draw_color windows_info.render ~rgb:(0,0,0) ~a:255;
         Sdlrender.clear windows_info.render;
+        let rays = Raycasting.raycast level in
+        let rays = List.sort (fun r1 r2 -> 
+            if r1.distance > r2.distance then -1
+            else if r1.distance < r2.distance then 1
+            else 0 ) rays in
 
         if draw_2D then (
             Drawer2D.drawLevel windows_info level;
-            let rays = Raycasting.raycast windows_info level in
             List.iter (fun ray -> Drawer2D.drawRay windows_info level ray) rays;
         ) else (
-            let rays = Raycasting.raycast windows_info level in
             List.iter (fun ray -> Drawer3D.drawRay windows_info level ray) rays;
         );
 
         Sdlrender.render_present windows_info.render;
     ) in
-
     update ();
-
 
     let rec event_loop level =
         match Sdlevent.poll_event () with

@@ -46,9 +46,9 @@ type ray = {
   distance: float; 
   touched_pos : position;
   intersection : position;
-  angle : int;
+  angle : float;
   angle_vec : position; (*vecteur de l'angle où le joueur regarde*)
-  angle_min : int;
-  angle_max : int;
-  angle_step : int
+  angle_min : float;
+  angle_max : float;
+  angle_step : float
 }
