@@ -14,7 +14,6 @@ let color_of_wall = function
     | _ -> black;;
 
 
-
 let drawRay windows_info level ray = 
     
     if not ray.rayTouched then () else
@@ -42,7 +41,7 @@ let drawRay windows_info level ray =
     ();;
 
 let drawLevel windows_info level : unit = 
-    let plot : tile array array = level.plot in
+    let plot = level.plot in
     let player = level.player.pos in
 
     let plot_width = int_of_float level.plot_width in
@@ -70,14 +69,30 @@ let drawLevel windows_info level : unit =
         let y_decimal = player.y -. (float_of_int y_full) in 
         let x2 = ((int_of_float (x_decimal *. 100.))*block_width)/100 in
         let y2 = ((int_of_float (y_decimal *. 100.))*block_height)/100 in
-    
-        Sdlrender.draw_point
-            windows_info.render (x_full*block_height + x2 ,
-            y_full*block_width + y2);
 
-        ()
+        Sdlrender.set_draw_color windows_info.render ~rgb:white ~a:255 ;
+        let rect = Sdlrect.make 
+                ~pos:(x_full*block_height + x2, y_full*block_width + y2)
+                ~dims:(block_width/10, block_height/10) in
+        Sdlrender.fill_rect windows_info.render rect
+    in
+
+    let drawEnemy enemy : unit = 
+        let x_full = int_of_float enemy.pos.x in
+        let y_full = int_of_float enemy.pos.y in
+        let x_decimal = enemy.pos.x -. (float_of_int x_full) in 
+        let y_decimal = enemy.pos.y -. (float_of_int y_full) in 
+        let x2 = ((int_of_float (x_decimal *. 100.))*block_width)/100 in
+        let y2 = ((int_of_float (y_decimal *. 100.))*block_height)/100 in
+
+        Sdlrender.set_draw_color windows_info.render ~rgb:red ~a:255 ;
+        let rect = Sdlrect.make 
+                ~pos:(x_full*block_height + x2, y_full*block_width + y2)
+                ~dims:(block_width/10, block_height/10) in
+        Sdlrender.fill_rect windows_info.render rect
     in
 
     drawPlot 0 0 ;
     drawPlayer ();
+    List.iter drawEnemy level.enemies;
     ();;
