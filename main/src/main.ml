@@ -47,7 +47,7 @@ let () =
     let draw_2D = windows_info.parameters.drawer2D in
 
     let update () = (
-        (* Common.actionEnemy level;  *)
+        (* Enemy.actionEnemy level; *)
         
         Sdlrender.set_draw_color windows_info.render ~rgb:(0,0,0) ~a:255;
         Sdlrender.clear windows_info.render;

@@ -1,18 +1,6 @@
 open AST
 
 
-let aporte (player:player) (enemy : enemy) = 
-    if ( player.pos.x >= enemy.pos.x && player.pos.x <= enemy.pos.x +. 1.5 
-        && player.pos.y >= enemy.pos.y && player.pos.y <= enemy.pos.y +. 1.5) then true 
-    else( if( player.pos.x <= enemy.pos.x && player.pos.x >= enemy.pos.x -. 1.5 
-        && player.pos.y <= enemy.pos.y && player.pos.y >= enemy.pos.y -. 1.5
-    )    then true 
-    else (if (player.pos.x >= enemy.pos.x && player.pos.x <= enemy.pos.x +. 1.5 &&
-        player.pos.y <= enemy.pos.y && player.pos.y >= enemy.pos.y -. 1.5 ) then true  
-    else (if (player.pos.x <= enemy.pos.x && player.pos.x >= enemy.pos.x -. 1.5 && 
-        player.pos.y >= enemy.pos.y && player.pos.y <= enemy.pos.y +. 1.5) then true else false   
-    ) ) ) 
-;;
 let myIntToFloat x = (* regarde si on doit arondir au supérieur ou inférieur DANS CERTAIN CAS pour le déplacement*)
     let y = int_of_float(x) in 
     let z = x -. float_of_int(y) in 

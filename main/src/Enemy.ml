@@ -50,6 +50,19 @@ let deplacement (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, dÃ
         )
 ;;
 
+
+let aporte (player:player) (enemy : enemy) = 
+  if ( player.pos.x >= enemy.pos.x && player.pos.x <= enemy.pos.x +. 1.5 
+      && player.pos.y >= enemy.pos.y && player.pos.y <= enemy.pos.y +. 1.5) then true 
+  else( if( player.pos.x <= enemy.pos.x && player.pos.x >= enemy.pos.x -. 1.5 
+      && player.pos.y <= enemy.pos.y && player.pos.y >= enemy.pos.y -. 1.5
+  )    then true 
+  else (if (player.pos.x >= enemy.pos.x && player.pos.x <= enemy.pos.x +. 1.5 &&
+      player.pos.y <= enemy.pos.y && player.pos.y >= enemy.pos.y -. 1.5 ) then true  
+  else (if (player.pos.x <= enemy.pos.x && player.pos.x >= enemy.pos.x -. 1.5 && 
+      player.pos.y >= enemy.pos.y && player.pos.y <= enemy.pos.y +. 1.5) then true else false   
+  ) ) ) ;;
+
 let actionEnemy (level : level) = 
   let see_Player enemy = (* Faire en sorte que les mob rÃ©agissent en cas de tir*)
       if aporte level.player enemy then (
