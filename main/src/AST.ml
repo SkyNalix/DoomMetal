@@ -11,16 +11,23 @@ type position = { mutable x : float; mutable y : float }
 
 type player = {
   pos : position;
-  view_angle : int
+  view_angle : int;
+  mutable hp : int;
 }
+
+type enemy = {
+   mutable pos : position;
+   mutable nom : string;
+   mutable hp : int ;
+}  
 
 type level = { 
   mutable player : player; 
+  mutable enemies : enemy list;
   plot : plot;
   plot_height : float;
   plot_width : float;
 }
-
 
 type parameters =  {
   debug : bool;
