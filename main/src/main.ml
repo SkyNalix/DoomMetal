@@ -2,26 +2,6 @@ open AST
 
 open Sdlevent
 
-
-let print_mouse_motion_event e =
-    Printf.printf "
-  mouse_motion_event ((
-    timestamp: %ld
-    window_id: %lX
-    buttons: %s
-    x: %d
-    y: %d
-    xrel: %d
-    yrel: %d
-  ))\n%!"
-    e.mm_timestamp
-    e.mm_window_id
-    (String.concat " "
-      (List.map string_of_int e.mm_buttons))
-    e.mm_x
-    e.mm_y
-    e.mm_xrel
-    e.mm_yrel
 let proc_events (level:level) e : level = 
     let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
     let x_change = sin radians *. 0.1 in
@@ -33,23 +13,26 @@ let proc_events (level:level) e : level =
         Sdl.quit ();
         exit 0
     | KeyDown { keycode = Sdlkeycode.Z } -> 
-        Common.update_player level x_change y_change 0
+        Player.update_player level x_change y_change 0
     | KeyDown { keycode = Sdlkeycode.S } -> 
-        Common.update_player level (neg x_change) (neg y_change) 0
+        Player.update_player level (neg x_change) (neg y_change) 0
     | KeyDown { keycode = Sdlkeycode.Q } -> 
-        Common.update_player level y_change (neg x_change) 0
+        Player.update_player level y_change (neg x_change) 0
     | KeyDown { keycode = Sdlkeycode.D } -> 
-        Common.update_player level (neg y_change) x_change 0
+        Player.update_player level (neg y_change) x_change 0
     | KeyDown { keycode = Sdlkeycode.Left } -> 
-        Common.update_player level 0. 0. (15)
+        Player.update_player level 0. 0. (15)
     | KeyDown { keycode = Sdlkeycode.Right } -> 
-        Common.update_player level 0. 0. (-15)
-    
+        Player.update_player level 0. 0. (-15)
+
     | Mouse_Motion e -> 
         if e.mm_xrel < 0 then
-            Common.update_player level 0. 0. 1
+            Player.update_player level 0. 0. 1
         else
-            Common.update_player level 0. 0. (-1)
+            Player.update_player level 0. 0. (-1)
+
+    | KeyDown { keycode = Sdlkeycode.Space} ->
+        Player.shoot y_change x_change level level.player level.enemies  
     | Quit _ ->
         Sdl.quit ();
         exit 0
@@ -64,6 +47,8 @@ let () =
     let draw_2D = windows_info.parameters.drawer2D in
 
     let update () = (
+        (* Enemy.actionEnemy level; *)
+        
         Sdlrender.set_draw_color windows_info.render ~rgb:(0,0,0) ~a:255;
         Sdlrender.clear windows_info.render;
         let rays = Raycasting.raycast level in

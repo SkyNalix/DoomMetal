@@ -1,21 +1,27 @@
 open AST
 
 
+let floatToInt x = 
+    let sub = int_of_float(x) in 
+    if (x -. float_of_int(sub) >= 0.5 ) then sub+1 else sub 
+;;
+
+let toucheUnMur x y (level : level)=
+    match level.plot.(floatToInt y).(floatToInt x) with 
+    | NOTHING -> false 
+    | _ -> true
+;;
+
+let arrondir (x : float) (valeur : float ) (arrondit : float) =  (* arrondit pour savoir si on touche quelqu'un -1 -0.6    *)
+    x +. 0.35 > arrondit && x -. arrondit < valeur
+;;
+
+
 
 let texture_of_wall = function
     | WALL -> "white_bricks"
     | RED_WALL -> "red_bricks"
     | _ -> "cobblestone";;
-
-let update_player (level:level) x y view_angle : level =
-    level.player <- {
-        pos = {
-            x=(level.player.pos.x +. x);
-            y=(level.player.pos.y +. y)
-        };
-        view_angle = (level.player.view_angle + view_angle) mod 360
-    };
-    level ;;
 
 let parameters = 
     let open AST in
@@ -32,7 +38,7 @@ let parameters =
         | _ -> args
         )
     args
-    Sys.argv
+    Sys.argv;;
     
 let make_default_windows_info level : windows_info = (
     let width, height = (500, 500) in
