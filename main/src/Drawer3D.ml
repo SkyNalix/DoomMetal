@@ -17,6 +17,10 @@ let texture_to_ty = function
 | RED_WALL -> 1 
 | TRANSPARENT_WALL ->  failwith "no texture for TRANSPARENT_WALL"
 
+
+let float_approx_eq f1 f2 approx = 
+    f1 < (f2+.approx) && f1 > (f2-.approx)
+
 let drawRay windows_info level ray =
     if not (ray.rayTouched) then (failwith "ray not touched") else
     
@@ -37,17 +41,21 @@ let drawRay windows_info level ray =
     let rec_start_X = int_of_float ((ray.angle_max -. ray.angle) *. (float_of_int win_step)) in
     let rec_start_Y = height/2 - rect_height/2 in
 
-    let intersect_x = fst (Float.modf ray.intersection.x) in
-    let intersect_y = fst (Float.modf ray.intersection.y) in
+    let intersect_x = 
+        let decimal = Float.floor ray.intersection.x in
+        if decimal = 0. then 0. else ray.intersection.x -. decimal in
+    let intersect_y = 
+        let decimal = Float.floor ray.intersection.y in
+        if decimal = 0. then 0. else ray.intersection.y -. decimal in
     let in_texture_intersection = mod_float (intersect_x +. intersect_y) 1.0 in 
 
     let tx = 
         let tmp = int_of_float (in_texture_intersection *. 64.) in
-        if (ray.angle_vec.x < 0. && intersect_y <> 0.) ||
+        if (ray.angle_vec.x < 0. && float_approx_eq intersect_x 0. 0.01 ) ||
             (ray.angle_vec.y > 0. && intersect_x <> 0.) then
-            (63-tmp) mod 64
+            63-tmp
         else
-            tmp mod 64
+            tmp
     in
 
     let wall = level.plot.(int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x) in
@@ -61,6 +69,5 @@ let drawRay windows_info level ray =
         ~src_rect:(Sdlrect.make ~pos:(tx,0) ~dims:(1,64))
         ~dst_rect:(Sdlrect.make ~pos:(rec_start_X, rec_start_Y) 
                     ~dims:(win_step, rect_height))
-        ~angle:0.
         ();
     ();;
