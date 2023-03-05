@@ -27,9 +27,9 @@ let rec shoot y_change x_change level (player:player) enemies =
 ;;
 
 let update_player level x y view_angle =
-  let a = Common.myIntToFloat (level.player.pos.x +. x ) -1 in 
-  let b = Common.myIntToFloat (level.player.pos.y +. y  ) -1 in
-  if level.plot.(a).(b) = NOTHING then (
+  let a = int_of_float (level.player.pos.x +. x ) in 
+  let b = int_of_float (level.player.pos.y +. y  ) in
+  if level.plot.(b).(a) = NOTHING then (
       level.player <- { level.player with
           pos = {
               x=(level.player.pos.x +. x);
