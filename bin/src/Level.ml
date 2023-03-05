@@ -4,7 +4,8 @@ let get s =
   {
   player = {
      pos = pos;
-     view_angle = 180
+     view_angle = 180;
+     hp = 100
   };
   plot=plot
 };;

@@ -13,7 +13,8 @@ type position = { mutable x : float; mutable y : float }
 
 type player = {
   mutable pos : position;
-  view_angle : int
+  view_angle : int;
+  mutable hp : int;
 }
 
 type ennemi = {

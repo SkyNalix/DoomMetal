@@ -113,7 +113,7 @@ let drawLevel windows_info level : unit =
     in
 
 
-    let rec drawEnnemiD (liste : ennemi list) () : unit = 
+    let rec drawEnnemi (liste : ennemi list) () : unit = 
         match liste with 
         | [] -> ()
         | enn :: l ->
@@ -129,14 +129,13 @@ let drawLevel windows_info level : unit =
             ~radius:5
             (x_full*block_height + x2 ,
             y_full*block_width + y2);
-            drawEnnemiD l ()      
+            drawEnnemi l ()      
     in
 
     
 
     drawPlot 0 0 ;
     drawPlayer ();
-    drawEnnemiD !moblist ();
-    (*drawEnnemi windows_info !moblist; *) 
+    drawEnnemi !moblist ();
     ();;
 

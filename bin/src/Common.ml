@@ -34,8 +34,8 @@ let print_Position (pos : position)  (str : string) =
     ()
 ;;
 
-let arrondir (x : float) (valeur : float ) =  (* -1 -0.6    *)
-    x +. 0.35 > valeur && x -. 0.35 < valeur
+let arrondir (x : float) (valeur : float ) (arrondit : float) =  (* arrondit pour savoir si on touche quelqu'un -1 -0.6    *)
+    x +. 0.35 > arrondit && x -. arrondit < valeur
 ;;
 
 let toucheUnMur x y (level : level)=
@@ -43,7 +43,7 @@ let toucheUnMur x y (level : level)=
     
     let tx = floatToInt x in 
     let ty = floatToInt y in 
-    print_string("what's happening here ? : ") ; print_int( floatToInt x); print_string("\n");
+    (*print_string("what's happening here ? : ") ; print_int( floatToInt x); print_string("\n"); *)
     
     let tuile = level.plot.(tx).(ty) in 
     match tuile with 
@@ -56,7 +56,7 @@ let rec auxTire  y_change x_change (player : player) moblist py px level = (* me
         
         let rec aux player liste  =
                 match liste with
-                | enn  :: l ->  if (arrondir enn.posE.y py && arrondir enn.posE.x px   ) then (print_string("TOUCHER \n"); 
+                | enn  :: l ->  if (arrondir enn.posE.y py 0.35 && arrondir enn.posE.x px 0.35   ) then (print_string("TOUCHER \n"); 
                         let aa : int ref = enn.hp in enn.hp := !aa -1; Drawer2D.moblist := List.filter (fun enn -> enn.hp > ref 0) !Drawer2D.moblist ; 
                 
                         () ) 
@@ -90,9 +90,9 @@ let aporte (player:player) (ennemi : ennemi) =
     ) ) ) 
 ;;
 
-let deplacement (player:player) (ennemi : ennemi)  = (* Deplacement float = 0.05, déplacement map = 1 *)
+let deplacement (level:level) (ennemi : ennemi)  = (* Deplacement float = 0.05, déplacement map = 1 *)
 
-        if(player.pos.x >= ennemi.posE.x) then( 
+        if(level.player.pos.x >= ennemi.posE.x) then( 
             ennemi.posE <- {
                 x = ennemi.posE.x +. 0.08;
                 y = ennemi.posE.y;
@@ -104,7 +104,7 @@ let deplacement (player:player) (ennemi : ennemi)  = (* Deplacement float = 0.05
             };
             ) ;
 
-        if(player.pos.y >= ennemi.posE.y) then (
+        if(level.player.pos.y >= ennemi.posE.y) then (
             ennemi.posE <- {
                 x = ennemi.posE.x;
                 y = ennemi.posE.y +. 0.08;
@@ -117,24 +117,26 @@ let deplacement (player:player) (ennemi : ennemi)  = (* Deplacement float = 0.05
             };
         ) ;
             
-            
-        print_float(player.pos.x);
-        print_string(" | ");
-        print_float(player.pos.x);
-        print_string(" \n");
-    
-        print_float(ennemi.posE.x);
-        print_string(" ");
-        print_float(ennemi.posE.x);
-        print_string(" \n");
-
-
-            ()
+        (* check contact pour dégâts *)
+        if(arrondir ennemi.posE.x level.player.pos.x 0.15 && arrondir ennemi.posE.y level.player.pos.y 0.15) 
+        then (  
+            level.player <- {
+                    pos = {
+                x=(level.player.pos.x );
+                y=(level.player.pos.y )
+            };
+            view_angle = (level.player.view_angle );
+            hp = level.player.hp - 5;
+            }; 
+            print_string("vous avez perdu 5 hp \n");
+            if level.player.hp = 0 then (print_string("perdu \n"); Bogue.quit () ) else ()
+             )
+        else ()
 
 ;;
 
 
-let actionEnnemi (player : player) = 
+let actionEnnemi (level : level) = 
     
     let see_Player player = (* Faire en sorte que les mob réagissent en cas de tir*)
         
@@ -142,14 +144,14 @@ let actionEnnemi (player : player) =
             match liste with
             | [] -> ()
             | x :: l ->  
-                    if (aporte player x) then (print_string("deplacement \n"); deplacement player x; () )
+                    if (aporte player x) then (print_string("deplacement \n"); deplacement level x; () )
                     else print_string("pas vue \n"); ()
             in 
 
         aux !Drawer2D.moblist            
     in
 
-    see_Player player;
+    see_Player level.player;
 ;;
 
 let bind_default_events windows_info level  = (
@@ -167,7 +169,8 @@ let bind_default_events windows_info level  = (
                 x=(level.player.pos.x +. x);
                 y=(level.player.pos.y +. y)
             };
-            view_angle = (level.player.view_angle + view_angle) mod 360
+            view_angle = (level.player.view_angle + view_angle) mod 360;
+            hp = level.player.hp;
         }; ()
         |_ ->  ()
         
@@ -180,7 +183,7 @@ let bind_default_events windows_info level  = (
         let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
         let x_change = sin radians *. 0.1 in
         let y_change = cos radians *. 0.1 in 
-        actionEnnemi level.player; 
+        actionEnnemi level; 
 
         let keystates = get_keyboard_state () in
         if keystates.{get_scancode_from_key (K.z)} <> 0 then (
