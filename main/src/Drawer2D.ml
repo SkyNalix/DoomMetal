@@ -96,3 +96,9 @@ let drawLevel windows_info level : unit =
     drawPlayer ();
     List.iter drawEnemy level.enemies;
     ();;
+
+let render windows_info level rays = 
+    drawLevel windows_info level;
+    List.iter (fun ray -> drawRay windows_info level ray) rays;
+    ();;
+    

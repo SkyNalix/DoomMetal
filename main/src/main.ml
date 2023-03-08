@@ -58,10 +58,9 @@ let () =
             else 0 ) rays in
 
         if draw_2D then (
-            Drawer2D.drawLevel windows_info level;
-            List.iter (fun ray -> Drawer2D.drawRay windows_info level ray) rays;
+            Drawer2D.render windows_info level rays;
         ) else (
-            List.iter (fun ray -> Drawer3D.drawRay windows_info level ray) rays;
+            Drawer3D.render windows_info level rays;
         );
 
         Sdlrender.render_present windows_info.render;

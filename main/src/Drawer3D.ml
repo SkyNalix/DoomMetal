@@ -1,14 +1,14 @@
 open AST
 
+let textures_dir = "main/resources/textures/"
 let images = 
-    let dir = "main/resources/textures/" in
     [
-        ("white_bricks", Sdlsurface.load_bmp ~filename:(dir^"white_bricks.bmp"));
-        ("red_bricks", Sdlsurface.load_bmp ~filename:(dir^"red_bricks.bmp"));
-        (* ("cobblestone", Sdlsurface.load_bmp ~filename:(dir^"cobblestone.bmp")); *)
-        (* ("door", Sdlsurface.load_bmp ~filename:(dir^"door.bmp")); *)
-        (* ("wooden_planks", Sdlsurface.load_bmp ~filename:(dir^"wooden_planks.bmp")); *)
-        (* ("purple_thing", Sdlsurface.load_bmp ~filename:(dir^"purple_thing.bmp")); *)
+    ("white_bricks", Sdlsurface.load_bmp ~filename:(textures_dir^"white_bricks.bmp"));
+    ("red_bricks", Sdlsurface.load_bmp ~filename:(textures_dir^"red_bricks.bmp"));
+    (* ("cobblestone", Sdlsurface.load_bmp ~filename:(textures_dir^"cobblestone.bmp")); *)
+    (* ("door", Sdlsurface.load_bmp ~filename:(textures_dir^"door.bmp")); *)
+    (* ("wooden_planks", Sdlsurface.load_bmp ~filename:(textures_dir^"wooden_planks.bmp")); *)
+    (* ("purple_thing", Sdlsurface.load_bmp ~filename:(textures_dir^"purple_thing.bmp")); *)
     ]
 
 let texture_to_ty = function
@@ -26,7 +26,8 @@ let drawRay windows_info level ray =
     
     let width  = windows_info.drawer3D_width in
     let height = windows_info.drawer3D_height in
-        
+    
+
 
     let distance = (* fisheye fix *)
         let ca = ((float_of_int level.player.view_angle) -. ray.angle) 
@@ -70,4 +71,22 @@ let drawRay windows_info level ray =
         ~dst_rect:(Sdlrect.make ~pos:(rec_start_X, rec_start_Y) 
                     ~dims:(win_step, rect_height))
         ();
+    ();;
+
+
+let render windows_info level rays = 
+    (* Rendering the sky *)
+    Sdlrender.copyEx 
+        windows_info.render 
+        ~texture:(
+            Sdltexture.create_from_surface windows_info.render 
+            (Sdlsurface.load_bmp ~filename:("main/resources/textures/sky.bmp"))
+        )
+        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(640-1,480-1))
+        ~dst_rect:(Sdlrect.make ~pos:(0,0) 
+            ~dims:(windows_info.drawer3D_width, windows_info.drawer3D_height/2))
+        ();
+    
+    (* Rendering the rays *)
+    List.iter (fun ray -> drawRay windows_info level ray) rays;
     ();;
