@@ -1,32 +1,40 @@
 type tile = 
-
   | NOTHING
   | WALL
   | RED_WALL
   | TRANSPARENT_WALL
 
-type plot = tile array array
+type floor_tile = 
+  | NORMAL
+  | ICE
 
 type position = { mutable x : float; mutable y : float }
 
 type player = {
   pos : position;
-  view_angle : int;
+  mutable view_angle : int;
   mutable hp : int;
+  mutable forward_speed : float;
+  mutable sideway_speed : float;
 }
 
 type enemy = {
    mutable pos : position;
-   mutable nom : string;
    mutable hp : int ;
 }  
+
+type map = {
+  ceiling : bool;
+  plot : tile array array;
+  floor : floor_tile array array;
+  height : int;
+  width : int;
+}
 
 type level = { 
   mutable player : player; 
   mutable enemies : enemy list;
-  plot : plot;
-  plot_height : float;
-  plot_width : float;
+  map : map
 }
 
 type parameters =  {
@@ -44,8 +52,6 @@ type windows_info = {
     drawer3D_width : int;
     drawer2D_height : int;
     drawer2D_width : int;
-    block_height : int;
-    block_width : int;
 }
 
 type ray = {

@@ -1,7 +1,7 @@
-open AST
+open Ast
 
 let raycast_on_angle level rayDir =
-    let plot = level.plot in
+    let plot = level.map.plot in
     let player_pos = level.player.pos in
 
     let pos = {x=player_pos.x; y=player_pos.y} in
@@ -65,8 +65,8 @@ let raycast_on_angle level rayDir =
 
 let aux_raycast level angle angle_min angle_max angle_step =
 
-    let height = level.plot_height in
-    let width= level.plot_width in
+    let height = float_of_int level.map.height in
+    let width = float_of_int level.map.width in
 
     let player = level.player in
 

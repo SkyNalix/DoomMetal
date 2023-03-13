@@ -1,9 +1,10 @@
-(lang dune 3.0)
+(lang dune 2.7)
 
 (name DoomMetal)
 (authors "Tazouev Arbi & Guinet Virgile")
-(maintainers "Tazouev Arbi")
-
+(maintainers "Tazouev Arbi" "Guinet Virgile")
+(using menhir 2.1)
+(cram enable)
 (package
  (name DoomMetal)
  (synopsis "A short synopsis")

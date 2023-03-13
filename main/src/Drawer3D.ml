@@ -1,27 +1,17 @@
-open AST
+open Ast
 
-let textures_dir = "main/resources/textures/"
-let images = 
-    [
-    ("white_bricks", Sdlsurface.load_bmp ~filename:(textures_dir^"white_bricks.bmp"));
-    ("red_bricks", Sdlsurface.load_bmp ~filename:(textures_dir^"red_bricks.bmp"));
-    (* ("cobblestone", Sdlsurface.load_bmp ~filename:(textures_dir^"cobblestone.bmp")); *)
-    (* ("door", Sdlsurface.load_bmp ~filename:(textures_dir^"door.bmp")); *)
-    (* ("wooden_planks", Sdlsurface.load_bmp ~filename:(textures_dir^"wooden_planks.bmp")); *)
-    (* ("purple_thing", Sdlsurface.load_bmp ~filename:(textures_dir^"purple_thing.bmp")); *)
-    ]
 
-let texture_to_ty = function
+let texture_to_plot_tile textures = function
+| WALL -> List.assoc "white_bricks" textures
+| RED_WALL -> List.assoc "red_bricks" textures
 | NOTHING -> failwith "no texture for NOTHING"
-| WALL -> 0
-| RED_WALL -> 1 
 | TRANSPARENT_WALL ->  failwith "no texture for TRANSPARENT_WALL"
 
 
 let float_approx_eq f1 f2 approx = 
     f1 < (f2+.approx) && f1 > (f2-.approx)
 
-let drawRay windows_info level ray =
+let drawRay windows_info level textures ray =
     if not (ray.rayTouched) then (failwith "ray not touched") else
     
     let width  = windows_info.drawer3D_width in
@@ -59,10 +49,8 @@ let drawRay windows_info level ray =
             tmp
     in
 
-    let wall = level.plot.(int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x) in
-    let texture = Sdltexture.create_from_surface 
-            windows_info.render 
-            (List.assoc (Common.texture_of_wall wall) images) in
+    let wall = level.map.plot.(int_of_float ray.touched_pos.y).(int_of_float ray.touched_pos.x) in
+    let texture = texture_to_plot_tile textures wall in
 
     Sdlrender.copyEx 
         windows_info.render 
@@ -74,19 +62,19 @@ let drawRay windows_info level ray =
     ();;
 
 
-let render windows_info level rays = 
+let render windows_info level textures rays = 
     (* Rendering the sky *)
-    Sdlrender.copyEx 
-        windows_info.render 
-        ~texture:(
-            Sdltexture.create_from_surface windows_info.render 
-            (Sdlsurface.load_bmp ~filename:("main/resources/textures/sky.bmp"))
-        )
-        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(640-1,480-1))
-        ~dst_rect:(Sdlrect.make ~pos:(0,0) 
-            ~dims:(windows_info.drawer3D_width, windows_info.drawer3D_height/2))
-        ();
-    
+    if level.map.ceiling then (
+        let text = List.assoc "sky" textures in
+        Sdlrender.copyEx 
+            windows_info.render 
+            ~texture:text
+            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(640-1,480-1))
+            ~dst_rect:(Sdlrect.make ~pos:(0,0) 
+                ~dims:(windows_info.drawer3D_width, windows_info.drawer3D_height/2))
+            ();
+    );
+
     (* Rendering the rays *)
-    List.iter (fun ray -> drawRay windows_info level ray) rays;
+    List.iter (fun ray -> drawRay windows_info level textures ray) rays;
     ();;

@@ -1,4 +1,4 @@
-open AST
+open Ast
 
 let rec shoot y_change x_change level (player:player) enemies = 
   let px = player.pos.x in
@@ -23,20 +23,21 @@ let rec shoot y_change x_change level (player:player) enemies =
           }
       } in
       shoot y_change x_change level player enemies 
-  ) else level
+  );
 ;;
 
-let update_player level x y view_angle =
-  let a = int_of_float (level.player.pos.x +. x ) in 
-  let b = int_of_float (level.player.pos.y +. y  ) in
-  if level.plot.(b).(a) = NOTHING then (
-      level.player <- { level.player with
-          pos = {
-              x=(level.player.pos.x +. x);
-              y=(level.player.pos.y +. y)
-          };
-          view_angle = (level.player.view_angle + view_angle) mod 360;
-      }
-  );
-  level;;
+let update_pos level =
+    let player = level.player in
+    let angle_rad = (float_of_int player.view_angle) *. Float.pi /. 180.0 in
+    let dx = sin angle_rad *. player.forward_speed -. 
+            cos angle_rad *. player.sideway_speed in
+    let dy = cos angle_rad *. player.forward_speed +. 
+            sin angle_rad *. player.sideway_speed in
+    let new_x = player.pos.x +. dx in
+    let new_y = player.pos.y +. dy in
+    if level.map.plot.(int_of_float new_y).(int_of_float new_x) = NOTHING then (
+        player.pos.x <- new_x;
+        player.pos.y <-new_y;   
+    );
+    ();;
 
