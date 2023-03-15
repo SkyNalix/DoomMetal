@@ -2,7 +2,8 @@ open Ast
 
 open Sdlevent
 
-let proc_events (level:level) event : unit = 
+let pred_mouse_pos = ref (-1);;
+let proc_events windows_info (level:level) event : unit = 
     let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
     let x_change = sin radians *. 0.1 in
     let y_change = cos radians *. 0.1 in
@@ -32,8 +33,9 @@ let proc_events (level:level) event : unit =
     | Mouse_Motion e -> 
         if e.mm_xrel < 0 then
             level.player.view_angle <- level.player.view_angle + 1
-        else
-            level.player.view_angle <- level.player.view_angle - 1
+        else if e.mm_xrel > 0 then
+            level.player.view_angle <- level.player.view_angle - 1;
+        Sdlmouse.warp_in_window windows_info.window ~x:500 ~y:500;
 
     | KeyDown { keycode = Sdlkeycode.Space} ->
         Player.shoot y_change x_change level level.player level.enemies  
@@ -82,7 +84,7 @@ let () =
     let rec event_loop () =
         match Sdlevent.poll_event () with
             | Some ev -> 
-                proc_events level ev;
+                proc_events windows_info level ev;
                 event_loop ()
             | None -> ()
     in
