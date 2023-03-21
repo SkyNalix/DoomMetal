@@ -35,15 +35,14 @@ let update_pos level =
     let floor_tile = level.map.floor.(p_y).(p_x) in
     let friction_factor = Ast.friction_of_floor_tile floor_tile in
 
-  (* apply friction *)
-  player.acceleration <- (fst player.acceleration -. friction_factor *. (fst player.velocity),
-                          snd player.acceleration -. friction_factor *. (snd player.velocity));
+    (* apply friction *)
+    player.acceleration.x <- player.acceleration.x -. friction_factor *. (player.velocity.x);
+    player.acceleration.y <- player.acceleration.y -. friction_factor *. (player.velocity.y);
 
-
-  let friction = friction_factor *. (sqrt (fst player.velocity ** 2.0 +. snd player.velocity ** 2.0)) in
-  player.velocity <- (fst player.velocity +. (fst player.acceleration -. friction) *. time_step,
-                      snd player.velocity +. (snd player.acceleration -. friction) *. time_step);
-    player.pos.x <- player.pos.x +. fst player.velocity *. time_step +. 0.5 *. fst player.acceleration *. time_step ** 2.0;
-    player.pos.y <- player.pos.y +. snd player.velocity *. time_step +. 0.5 *. snd player.acceleration *. time_step ** 2.0;
+    let friction = friction_factor *. (sqrt (player.velocity.x ** 2.0 +. player.velocity.y ** 2.0)) in
+    player.velocity.x <- player.velocity.x +. (player.acceleration.x -. friction) *. time_step;
+    player.velocity.y <- player.velocity.y +. (player.acceleration.y -. friction) *. time_step;
+    player.pos.x <- player.pos.x +. player.velocity.x *. time_step +. 0.5 *. player.acceleration.x *. time_step ** 2.0;
+    player.pos.y <- player.pos.y +. player.velocity.y *. time_step +. 0.5 *. player.acceleration.y *. time_step ** 2.0;
     ();;
 

@@ -4,13 +4,10 @@ open Sdlevent
 
 
 let vector_scalar_mult v s =
-    let x, y = v in
-    (x *. s, y *. s)
+    {x=v.x *. s; y=v.y *. s}
 
 let vector_add v1 v2 =
-    let x1, y1 = v1 in
-    let x2, y2 = v2 in
-    (x1 +. x2, y1 +. y2)
+    {x= v1.x +. v2.x; y= v1.y +. v2.y}
 
 
 let proc_events windows_info (level:level) event : unit = 
@@ -26,20 +23,20 @@ let proc_events windows_info (level:level) event : unit =
         Sdl.quit ();
         exit 0
     | KeyDown { keycode = Sdlkeycode.Z } -> 
-        player.acceleration <- acceleration_factor *. (sin radians),
-                           acceleration_factor *. (cos radians)
+        player.acceleration.x <- acceleration_factor *. (sin radians);
+        player.acceleration.y <- acceleration_factor *. (cos radians);
 
     | KeyDown { keycode = Sdlkeycode.Q } -> 
-        player.acceleration <- acceleration_factor *. (cos radians),
-                           acceleration_factor *. (-. sin radians)
+        player.acceleration.x <- acceleration_factor *. (cos radians);
+        player.acceleration.y <- acceleration_factor *. (-. sin radians);
 
     | KeyDown { keycode = Sdlkeycode.S } ->
-        player.acceleration <- -. (acceleration_factor *. (sin radians)),
-                           -. (acceleration_factor *. (cos radians))
+        player.acceleration.x <- -. (acceleration_factor *. (sin radians));
+        player.acceleration.y <- -. (acceleration_factor *. (cos radians));
 
     | KeyDown { keycode = Sdlkeycode.D } -> 
-        player.acceleration <- acceleration_factor *. (-. cos radians),
-                           acceleration_factor *. (sin radians)
+        player.acceleration.x <- acceleration_factor *. (-. cos radians);
+        player.acceleration.y <- acceleration_factor *. (sin radians);
 
 
     | KeyDown { keycode = Sdlkeycode.Left } -> 
@@ -122,9 +119,9 @@ let () =
         player.velocity <- vector_scalar_mult player.velocity friction;
 
         (* Update the player's position *)
-        let pos =  vector_add (player.pos.x, player.pos.y) (vector_scalar_mult player.velocity time_step) in
-        player.pos.x <- fst pos;
-        player.pos.y <- snd pos;
+        let pos =  vector_add player.pos (vector_scalar_mult player.velocity time_step) in
+        player.pos.x <- pos.x;
+        player.pos.y <- pos.y;
 
         (* Player.update_pos level; *)
         render ();

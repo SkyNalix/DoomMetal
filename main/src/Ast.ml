@@ -20,8 +20,8 @@ type player = {
   mutable hp : int;
   mutable forward_speed : float;
   mutable sideway_speed : float;
-  mutable velocity : float * float;
-  mutable acceleration : float * float;
+  mutable velocity : position;
+  mutable acceleration : position;
 }
 
 type enemy = {
