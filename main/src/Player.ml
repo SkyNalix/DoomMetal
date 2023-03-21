@@ -28,16 +28,22 @@ let rec shoot y_change x_change level (player:player) enemies =
 
 let update_pos level =
     let player = level.player in
-    let angle_rad = (float_of_int player.view_angle) *. Float.pi /. 180.0 in
-    let dx = sin angle_rad *. player.forward_speed -. 
-            cos angle_rad *. player.sideway_speed in
-    let dy = cos angle_rad *. player.forward_speed +. 
-            sin angle_rad *. player.sideway_speed in
-    let new_x = player.pos.x +. dx in
-    let new_y = player.pos.y +. dy in
-    if level.map.plot.(int_of_float new_y).(int_of_float new_x) = NOTHING then (
-        player.pos.x <- new_x;
-        player.pos.y <-new_y;   
-    );
+
+    let time_step = 0.1 in
+    let p_x = int_of_float player.pos.x in
+    let p_y = int_of_float player.pos.y in
+    let floor_tile = level.map.floor.(p_y).(p_x) in
+    let friction_factor = Ast.friction_of_floor_tile floor_tile in
+
+  (* apply friction *)
+  player.acceleration <- (fst player.acceleration -. friction_factor *. (fst player.velocity),
+                          snd player.acceleration -. friction_factor *. (snd player.velocity));
+
+
+  let friction = friction_factor *. (sqrt (fst player.velocity ** 2.0 +. snd player.velocity ** 2.0)) in
+  player.velocity <- (fst player.velocity +. (fst player.acceleration -. friction) *. time_step,
+                      snd player.velocity +. (snd player.acceleration -. friction) *. time_step);
+    player.pos.x <- player.pos.x +. fst player.velocity *. time_step +. 0.5 *. fst player.acceleration *. time_step ** 2.0;
+    player.pos.y <- player.pos.y +. snd player.velocity *. time_step +. 0.5 *. snd player.acceleration *. time_step ** 2.0;
     ();;
 

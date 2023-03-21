@@ -8,6 +8,10 @@ type floor_tile =
   | NORMAL
   | ICE
 
+let friction_of_floor_tile = function
+  | NORMAL -> 0.8
+  | ICE -> 0.1
+
 type position = { mutable x : float; mutable y : float }
 
 type player = {
@@ -16,6 +20,8 @@ type player = {
   mutable hp : int;
   mutable forward_speed : float;
   mutable sideway_speed : float;
+  mutable velocity : float * float;
+  mutable acceleration : float * float;
 }
 
 type enemy = {

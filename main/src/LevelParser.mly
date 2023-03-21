@@ -53,6 +53,8 @@ player:
 					hp = $7;
 					forward_speed = 0.;
 					sideway_speed = 0.;
+					velocity = (0.,0.);
+					acceleration = (0.,0.);
 				}
 			}
 

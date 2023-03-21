@@ -2,34 +2,51 @@ open Ast
 
 open Sdlevent
 
-let pred_mouse_pos = ref (-1);;
+
+let vector_scalar_mult v s =
+    let x, y = v in
+    (x *. s, y *. s)
+
+let vector_add v1 v2 =
+    let x1, y1 = v1 in
+    let x2, y2 = v2 in
+    (x1 +. x2, y1 +. y2)
+
+
 let proc_events windows_info (level:level) event : unit = 
+    let player = level.player in
     let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
     let x_change = sin radians *. 0.1 in
     let y_change = cos radians *. 0.1 in
 
-    let run_speed = 0.05 in
-    
+    let acceleration_factor = 1.0 in
+
     match event with 
     | KeyDown { keycode = Sdlkeycode.Escape } ->
         Sdl.quit ();
         exit 0
     | KeyDown { keycode = Sdlkeycode.Z } -> 
-        level.player.forward_speed <- run_speed;
-    | KeyDown { keycode = Sdlkeycode.S } ->
-        level.player.forward_speed <- -.run_speed;
+        player.acceleration <- acceleration_factor *. (sin radians),
+                           acceleration_factor *. (cos radians)
+
     | KeyDown { keycode = Sdlkeycode.Q } -> 
-        level.player.sideway_speed <- -.run_speed;
+        player.acceleration <- acceleration_factor *. (cos radians),
+                           acceleration_factor *. (-. sin radians)
+
+    | KeyDown { keycode = Sdlkeycode.S } ->
+        player.acceleration <- -. (acceleration_factor *. (sin radians)),
+                           -. (acceleration_factor *. (cos radians))
+
     | KeyDown { keycode = Sdlkeycode.D } -> 
-        level.player.sideway_speed <- run_speed;
+        player.acceleration <- acceleration_factor *. (-. cos radians),
+                           acceleration_factor *. (sin radians)
+
+
     | KeyDown { keycode = Sdlkeycode.Left } -> 
         level.player.view_angle <- level.player.view_angle + 15;
     | KeyDown { keycode = Sdlkeycode.Right } -> 
         level.player.view_angle <- level.player.view_angle - 15;
-    | KeyUp { keycode = Sdlkeycode.Z } | KeyUp { keycode = Sdlkeycode.S } ->
-        level.player.forward_speed <- 0.;
-    | KeyUp { keycode = Sdlkeycode.Q } | KeyUp { keycode = Sdlkeycode.D } -> 
-        level.player.sideway_speed <- 0.;
+        
     | Mouse_Motion e -> 
         if e.mm_xrel < 0 then
             level.player.view_angle <- level.player.view_angle + 1
@@ -44,7 +61,7 @@ let proc_events windows_info (level:level) event : unit =
         Sdl.quit ();
         exit 0
     | _ -> ()
-
+    
 
 let () =
     let level = Level.get "1" in
@@ -61,7 +78,7 @@ let () =
 
     let fps = 1000/60 in
 
-    let update () = (
+    let render () = (
         (* Enemy.actionEnemy level; *)
         
         Sdlrender.set_draw_color windows_info.render ~rgb:(72,68,67) ~a:255;
@@ -79,7 +96,7 @@ let () =
         );
         Sdlrender.render_present windows_info.render;
     ) in
-    update ();
+    render ();
 
     let rec event_loop () =
         match Sdlevent.poll_event () with
@@ -88,11 +105,29 @@ let () =
                 event_loop ()
             | None -> ()
     in
+
+    let player = level.player in
+
+
     let rec main_loop () =
         event_loop ();
 
-        Player.update_pos level;
-        update ();
+        let time_step = 0.1 in
+        let friction = 0.9 in
+
+        player.acceleration <- vector_scalar_mult player.acceleration 0.8;
+
+        player.velocity <- vector_add player.velocity (vector_scalar_mult player.acceleration time_step);
+        
+        player.velocity <- vector_scalar_mult player.velocity friction;
+
+        (* Update the player's position *)
+        let pos =  vector_add (player.pos.x, player.pos.y) (vector_scalar_mult player.velocity time_step) in
+        player.pos.x <- fst pos;
+        player.pos.y <- snd pos;
+
+        (* Player.update_pos level; *)
+        render ();
         Sdltimer.delay ~ms:(fps);
         main_loop ()
 
