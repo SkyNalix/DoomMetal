@@ -55,3 +55,19 @@ Objectifs supplémentaires (à ajouter dans le calendrier)
 - HUD
 - son avec localisation
 - un peu de physique (accélération/décélération du joueur; frottements pour les collisions)
+
+<22/03/23>
+Pagani
+
+- affichage 3D, un petit bug d'image quand on s'approche, ok acceleration.deceleration mais encore work in progress
+- pas encore fait HUD
+- pas encore fait audio
+- fait un format dedié pour rentrer le code. 
+
+à faire:
+- Virgile : affichage des ennemie et possiblement audio
+- Arbi :
+    -finir deplacement: pour l'instant on ne peut pas se deplacer en diagonale 
+    (corriger le bug sur les textures)
+    - ensuite faire les HUD
+
