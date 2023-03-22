@@ -22,10 +22,18 @@
 
 ## Calendrier
     - création du terrain de jeu : mi décembre 
-    - affichage en 2D, vu vol d’oiseau : fin janvier
-    - création du Raycasting, avec affichage des rayons sur l'affichage 2D: fin février, début mars
-    - affichage 3D: avril
-    - amélioration de l'affichage ( ajout des ombres, effet de profondeur, etc...): mai
+    - création du Raycasting, avec affichage des rayons sur l'affichage 2D: fin decembre
+    - affichage en 2D, vu vol d’oiseau : debut janvier
+    - affichage 3D: mi janvier
+    - amélioration de l'affichage avec les textures: fevrier - debut mars
+    - amelioration du deplacement du joueur: fin mars-debut avril
+    - ajout et affichage des ennemies : avril
+    - HUD (barre de vie, arme, munition, etc...) - avril
+    - ajout des portes ou autre contenu - fin avril - debut mai
+    - Ajout de l'audio : fin avril
+    - ajout d'un menu principal avec selection des differents niveaux : mai
+    - ajout des contrôles avec une mannette: mai
+    
 
 ## Références
 
