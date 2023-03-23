@@ -112,16 +112,20 @@ let () =
         let time_step = 0.1 in
         let friction = 0.9 in
 
-        player.acceleration <- vector_scalar_mult player.acceleration 0.8;
+        let t = vector_scalar_mult player.acceleration 0.8 in
+        player.acceleration.x <- t.x;
+        player.acceleration.y <- t.y;
 
-        player.velocity <- vector_add player.velocity (vector_scalar_mult player.acceleration time_step);
-        
-        player.velocity <- vector_scalar_mult player.velocity friction;
+        let t = vector_add player.velocity (vector_scalar_mult player.acceleration time_step) in
+        player.velocity.x <- t.x;
+        player.velocity.y <- t.y;
+        let t = vector_scalar_mult player.velocity friction in
+        player.velocity.x <- t.x;
+        player.velocity.y <- t.y;
 
-        (* Update the player's position *)
-        let pos =  vector_add player.pos (vector_scalar_mult player.velocity time_step) in
-        player.pos.x <- pos.x;
-        player.pos.y <- pos.y;
+        let t = vector_add player.pos (vector_scalar_mult player.velocity time_step) in
+        player.pos.x <- t.x;
+        player.pos.y <- t.y;
 
         (* Player.update_pos level; *)
         render ();

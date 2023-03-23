@@ -12,21 +12,20 @@ let friction_of_floor_tile = function
   | NORMAL -> 0.8
   | ICE -> 0.1
 
+type fixed_position = { x : float; y : float }
 type position = { mutable x : float; mutable y : float }
 
 type player = {
   pos : position;
   mutable view_angle : int;
   mutable hp : int;
-  mutable forward_speed : float;
-  mutable sideway_speed : float;
-  mutable velocity : position;
-  mutable acceleration : position;
+  velocity : position;
+  acceleration : position;
 }
 
 type enemy = {
-   mutable pos : position;
-   mutable hp : int ;
+    pos : position;
+    mutable hp : int ;
 }  
 
 type map = {
@@ -38,7 +37,7 @@ type map = {
 }
 
 type level = { 
-  mutable player : player; 
+  player : player; 
   mutable enemies : enemy list;
   map : map
 }
@@ -63,10 +62,10 @@ type windows_info = {
 type ray = {
   rayTouched : bool;
   distance: float; 
-  touched_pos : position;
-  intersection : position;
+  touched_pos : fixed_position;
+  intersection : fixed_position;
   angle : float;
-  angle_vec : position; (*vecteur de l'angle où le joueur regarde*)
+  angle_vec : fixed_position; (*vecteur de l'angle où le joueur regarde*)
   angle_min : float;
   angle_max : float;
   angle_step : float

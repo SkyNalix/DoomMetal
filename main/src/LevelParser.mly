@@ -51,8 +51,6 @@ player:
 					pos = $1;
 					view_angle = $4;
 					hp = $7;
-					forward_speed = 0.;
-					sideway_speed = 0.;
 					velocity = {x=0.;y=0.};
 					acceleration = {x=0.;y=0.};
 				}

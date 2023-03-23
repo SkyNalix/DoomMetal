@@ -15,16 +15,9 @@ level {
             }
             hp = 1 
         }
-        enemy {
-            pos {
-                x= 4.5
-                y= 2.5
-            }
-            hp = 1 
-        }
     }
     map {
-        ceiling = 1
+        ceiling = 0
         plot {
             {1;1;1;1;1;1;1;1;1}
             {1;0;0;0;0;0;0;0;1}
