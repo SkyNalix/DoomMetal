@@ -33,12 +33,12 @@ let drawRay windows_info level textures ray =
     let rec_start_Y = height/2 - rect_height/2 in
 
     let intersect_x = 
-        let decimal = Float.floor ray.intersection.x in
-        if decimal = 0. then 0. else ray.intersection.x -. decimal in
+        let decimal = Float.round(ray.intersection.x *. 100.) /. 100. in
+        fst (Float.modf decimal) in
     let intersect_y = 
-        let decimal = Float.floor ray.intersection.y in
-        if decimal = 0. then 0. else ray.intersection.y -. decimal in
-    let in_texture_intersection = mod_float (intersect_x +. intersect_y) 1.0 in 
+        let decimal = Float.round(ray.intersection.y *. 100.) /. 100. in
+        fst (Float.modf decimal) in
+    let in_texture_intersection = intersect_x +. intersect_y in 
 
     let tx = 
         let tmp = int_of_float (in_texture_intersection *. 64.) in
