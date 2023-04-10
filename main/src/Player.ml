@@ -27,22 +27,63 @@ let rec shoot y_change x_change level (player:player) enemies =
 ;;
 
 let update_pos level =
+    let vector_scalar_mult v s =
+        {x=v.x *. s; y=v.y *. s} in
+    
+    let vector_add v1 v2 =
+        {x= v1.x +. v2.x; y= v1.y +. v2.y} in
+
     let player = level.player in
+    let time_step = 0.005 in
 
-    let time_step = 0.1 in
-    let p_x = int_of_float player.pos.x in
-    let p_y = int_of_float player.pos.y in
-    let floor_tile = level.map.floor.(p_y).(p_x) in
-    let friction_factor = Ast.friction_of_floor_tile floor_tile in
+        let player_x = int_of_float level.player.pos.x in
+        let player_y = int_of_float level.player.pos.y in
 
-    (* apply friction *)
-    player.acceleration.x <- player.acceleration.x -. friction_factor *. (player.velocity.x);
-    player.acceleration.y <- player.acceleration.y -. friction_factor *. (player.velocity.y);
+        let friction = Common.friction_of_floor_tile level.map.floor.(player_y).(player_x) in
+        let radians = (float_of_int level.player.view_angle) *.( Float.pi /. 180.) in
 
-    let friction = friction_factor *. (sqrt (player.velocity.x ** 2.0 +. player.velocity.y ** 2.0)) in
-    player.velocity.x <- player.velocity.x +. (player.acceleration.x -. friction) *. time_step;
-    player.velocity.y <- player.velocity.y +. (player.acceleration.y -. friction) *. time_step;
-    player.pos.x <- player.pos.x +. player.velocity.x *. time_step +. 0.5 *. player.acceleration.x *. time_step ** 2.0;
-    player.pos.y <- player.pos.y +. player.velocity.y *. time_step +. 0.5 *. player.acceleration.y *. time_step ** 2.0;
+        (* let player_dir = player's view direction, as a vector *)
+        let move_vec = {x=player.acceleration.x;y=player.acceleration.y} in
+      
+        (* calculate the x and y components of the movement vector, as described in the previous answer *)
+        let player_angle = radians in (* angle between player's view direction and x-axis *)
+        let cos_angle = cos player_angle in
+        let sin_angle = sin player_angle in
+        let move_x = (move_vec.x *. cos_angle) +. (move_vec.y *. sin_angle) in
+        let move_y = (move_vec.y *. cos_angle) -. (move_vec.x *. sin_angle) in
+      
+        (* calculate the player's new velocity based on the movement vector and acceleration *)
+        let accel_vec = {x=move_x; y=move_y} in
+        let new_vel = { x = player.velocity.x +. accel_vec.x; y = player.velocity.y +. accel_vec.y } in
+      
+        (* apply friction to the player's velocity *)
+        let friction_vec = { x = player.velocity.x *. friction; y = player.velocity.y *. friction } in
+        let final_vel = { x = new_vel.x -. friction_vec.x; y = new_vel.y -. friction_vec.y } in
+
+        player.velocity.x <- final_vel.x;
+        player.velocity.y <- final_vel.y;
+
+        let new_pos = vector_scalar_mult player.velocity (time_step) in
+        let new_pos = {
+            x=Float.round (new_pos.x *. 100.) /. 100.;
+            y=Float.round (new_pos.y *. 100.) /. 100.;
+        } in
+
+        let new_pos_colision =vector_add player.pos (vector_scalar_mult new_pos (1.4)) in
+        let new_pos_int_x = int_of_float new_pos_colision.x in
+        let new_pos_int_y = int_of_float new_pos_colision.y in
+        if level.map.plot.(new_pos_int_y).(new_pos_int_x) <> NOTHING then (
+            if level.map.plot.(new_pos_int_y).(player_x) = NOTHING then (
+                new_pos.x <- 0.;
+            ) else if level.map.plot.(player_y).(new_pos_int_x) = NOTHING then (
+                new_pos.y <- 0.;
+            ) else (
+                new_pos.x <- 0.;
+                new_pos.y <- 0.;
+            )
+        );
+        player.pos.x <- player.pos.x +. new_pos.x;
+        player.pos.y <- player.pos.y +. new_pos.y;
+    
     ();;
 

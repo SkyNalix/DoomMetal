@@ -16,27 +16,26 @@ let proc_events windows_info (level:level) event : unit =
     let x_change = sin radians *. 0.1 in
     let y_change = cos radians *. 0.1 in
 
-    let acceleration_factor = 1.0 in
-
     match event with 
     | KeyDown { keycode = Sdlkeycode.Escape } ->
         Sdl.quit ();
         exit 0
     | KeyDown { keycode = Sdlkeycode.Z } -> 
-        player.acceleration.x <- acceleration_factor *. (sin radians);
-        player.acceleration.y <- acceleration_factor *. (cos radians);
+        player.acceleration.y <- 1.;
 
     | KeyDown { keycode = Sdlkeycode.Q } -> 
-        player.acceleration.x <- acceleration_factor *. (cos radians);
-        player.acceleration.y <- acceleration_factor *. (-. sin radians);
+        player.acceleration.x <- 1.;
 
     | KeyDown { keycode = Sdlkeycode.S } ->
-        player.acceleration.x <- -. (acceleration_factor *. (sin radians));
-        player.acceleration.y <- -. (acceleration_factor *. (cos radians));
+        player.acceleration.y <- -. 1.;
 
     | KeyDown { keycode = Sdlkeycode.D } -> 
-        player.acceleration.x <- acceleration_factor *. (-. cos radians);
-        player.acceleration.y <- acceleration_factor *. (sin radians);
+        player.acceleration.x <- -. 1.;
+
+    | KeyUp { keycode = Sdlkeycode.Z } | KeyUp { keycode = Sdlkeycode.S }->
+        player.acceleration.y <- 0.;
+    | KeyUp { keycode = Sdlkeycode.Q } | KeyUp { keycode = Sdlkeycode.D }->
+        player.acceleration.x <- 0.;
 
 
     | KeyDown { keycode = Sdlkeycode.Left } -> 
@@ -62,7 +61,7 @@ let proc_events windows_info (level:level) event : unit =
 
 let () =
     let level = Level.get "1" in
-    let windows_info = Common.make_default_windows_info level in
+    let windows_info = Common.make_default_windows_info () in
     let textures_path = "main/resources/textures/" in
     let textures = [
         ("sky", "sky.bmp");
@@ -103,31 +102,9 @@ let () =
             | None -> ()
     in
 
-    let player = level.player in
-
-
     let rec main_loop () =
         event_loop ();
-
-        let time_step = 0.1 in
-        let friction = 0.9 in
-
-        let t = vector_scalar_mult player.acceleration 0.8 in
-        player.acceleration.x <- t.x;
-        player.acceleration.y <- t.y;
-
-        let t = vector_add player.velocity (vector_scalar_mult player.acceleration time_step) in
-        player.velocity.x <- t.x;
-        player.velocity.y <- t.y;
-        let t = vector_scalar_mult player.velocity friction in
-        player.velocity.x <- t.x;
-        player.velocity.y <- t.y;
-
-        let t = vector_add player.pos (vector_scalar_mult player.velocity time_step) in
-        player.pos.x <- t.x;
-        player.pos.y <- t.y;
-
-        (* Player.update_pos level; *)
+        Player.update_pos level;
         render ();
         Sdltimer.delay ~ms:(fps);
         main_loop ()

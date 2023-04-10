@@ -18,8 +18,8 @@ let arrondir (x : float) (valeur : float ) (arrondit : float) =  (* arrondit pou
 
 
 let friction_of_floor_tile = function
-    | NORMAL -> 1.0
-    | ICE -> 0.3
+    | NORMAL -> 0.1
+    | ICE -> 0.03
 
 let parameters = 
     let args : parameters = {
@@ -37,7 +37,7 @@ let parameters =
     args
     Sys.argv;;
     
-let make_default_windows_info level : windows_info = (
+let make_default_windows_info () : windows_info = (
     let width, height = (500, 500) in
     Sdl.init [`VIDEO];
     at_exit print_newline;
