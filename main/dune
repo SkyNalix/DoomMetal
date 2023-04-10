@@ -4,8 +4,10 @@
 (executable
   (public_name DoomMetal)
   (name main)
-  (libraries tsdl sdl2 )
+  (libraries tsdl sdl2)
 )
 
+(ocamllex LevelLexer)
+(ocamlyacc LevelParser)
 
 (env (dev (flags (:standard -warn-error -A -w -9 -w -32))))

@@ -4,7 +4,7 @@ all: build
 
 build:
 	dune build
-	mv -f ./_build/default/main/main.exe ./DoomMetal
+	cp -f ./_build/install/default/bin/DoomMetal ./
 
 exec: build
 	./DoomMetal 

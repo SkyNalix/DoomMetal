@@ -1,4 +1,4 @@
-open AST
+open Ast
 
 
 let floatToInt x = 
@@ -7,7 +7,7 @@ let floatToInt x =
 ;;
 
 let toucheUnMur x y (level : level)=
-    match level.plot.(floatToInt y).(floatToInt x) with 
+    match level.map.plot.(floatToInt y).(floatToInt x) with 
     | NOTHING -> false 
     | _ -> true
 ;;
@@ -17,14 +17,11 @@ let arrondir (x : float) (valeur : float ) (arrondit : float) =  (* arrondit pou
 ;;
 
 
-
-let texture_of_wall = function
-    | WALL -> "white_bricks"
-    | RED_WALL -> "red_bricks"
-    | _ -> "cobblestone";;
+let friction_of_floor_tile = function
+    | NORMAL -> 0.1
+    | ICE -> 0.03
 
 let parameters = 
-    let open AST in
     let args : parameters = {
         debug = false;
         drawer2D = false;
@@ -40,7 +37,7 @@ let parameters =
     args
     Sys.argv;;
     
-let make_default_windows_info level : windows_info = (
+let make_default_windows_info () : windows_info = (
     let width, height = (500, 500) in
     Sdl.init [`VIDEO];
     at_exit print_newline;
@@ -61,8 +58,8 @@ let make_default_windows_info level : windows_info = (
     Sdlmouse.show_cursor ~toggle:false;
     let width, height = Sdlwindow.get_size window in
     let drawer3D_height, drawer3D_width = height, width in
-    (* let drawer3D_height, drawer3D_width = height, min height width in *)
-    let drawer2D_height, drawer2D_width = height, min height width in
+    let drawer2D_height, drawer2D_width = 
+        let tmp = min height width in tmp, tmp in
 
     {
         parameters = parameters;
@@ -74,7 +71,5 @@ let make_default_windows_info level : windows_info = (
         drawer3D_width = drawer3D_width;
         drawer2D_height = drawer2D_height;
         drawer2D_width = drawer2D_width;
-        block_width = drawer2D_width / (Array.length level.plot.(0));
-        block_height = drawer2D_height / (Array.length level.plot);
     }
 )
