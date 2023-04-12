@@ -57,6 +57,7 @@ Objectifs supplémentaires (à ajouter dans le calendrier)
 - un peu de physique (accélération/décélération du joueur; frottements pour les collisions)
 
 <22/03/23>
+
 Pagani
 
 - affichage 3D, un petit bug d'image quand on s'approche, ok acceleration.deceleration mais encore work in progress
@@ -71,3 +72,19 @@ Pagani
     (corriger le bug sur les textures)
     - ensuite faire les HUD
 
+<12/04/2023>
+
+Degorre
+
+Fait :
+
+- collisions (avec glissement et friction)
+- déplacement diagonal
+- en cours : ennemis (détection s'il est dans le champs de vision, faite)
+- en cours : HUD
+
+À faire (jusqu'à la fin du projet) :
+
+- finir les objectifs en cours
+- faire le reste des objectifs prévus au calendrier
+- refactorisation du code ?
