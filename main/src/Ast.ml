@@ -16,15 +16,15 @@ type fixed_position = { x : float; y : float }
 type position = { mutable x : float; mutable y : float }
 
 type player = {
-  pos : position;
+   pos : position;
   mutable view_angle : int;
   mutable hp : int;
-  velocity : position;
-  acceleration : position;
+  mutable velocity : position;
+  mutable acceleration : position;
 }
 
 type enemy = {
-    pos : position;
+    mutable pos : position;
     mutable hp : int ;
 }  
 
@@ -37,7 +37,7 @@ type map = {
 }
 
 type level = { 
-  player : player; 
+  mutable player : player; 
   mutable enemies : enemy list;
   map : map
 }

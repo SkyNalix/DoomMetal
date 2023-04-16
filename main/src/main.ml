@@ -9,6 +9,8 @@ let vector_scalar_mult v s =
 let vector_add v1 v2 =
     {x= v1.x +. v2.x; y= v1.y +. v2.y}
 
+let shoot = ref false ;; 
+let sec_fin = ref 0.0;;
 
 let proc_events windows_info (level:level) event : unit = 
     let player = level.player in
@@ -51,7 +53,8 @@ let proc_events windows_info (level:level) event : unit =
         Sdlmouse.warp_in_window windows_info.window ~x:500 ~y:500;
 
     | KeyDown { keycode = Sdlkeycode.Space} ->
-        Player.shoot y_change x_change level level.player level.enemies  
+       shoot := true;
+       Player.shoot y_change x_change level level.player level.enemies  
 
     | Quit _ ->
         Sdl.quit ();
@@ -67,6 +70,14 @@ let () =
         ("sky", "sky.bmp");
         ("white_bricks", "white_bricks.bmp" );
         ("red_bricks", "red_bricks.bmp");
+        ("hud", "hud.bmp");
+        ("arme", "arme.bmp");
+        ("20PV", "20PV.bmp");
+        ("15PV", "15PV.bmp");
+        ("10PV", "10PV.bmp");
+        ("5PV", "5PV.bmp");
+        ("0PV", "0PV.bmp");
+        ("shotgun_blast","shotgun_blast.bmp");
     ] in
     let textures = List.map (fun (k, v) -> 
         k, Sdltexture.create_from_surface windows_info.render 
@@ -75,8 +86,7 @@ let () =
     let fps = 1000/60 in
 
     let render () = (
-        (* Enemy.actionEnemy level; *)
-        
+
         Sdlrender.set_draw_color windows_info.render ~rgb:(72,68,67) ~a:255;
         Sdlrender.clear windows_info.render;
         let rays = Raycasting.raycast level in
@@ -89,6 +99,9 @@ let () =
             Drawer2D.render windows_info level rays;
         ) else (
             Drawer3D.render windows_info level textures rays;
+            if (!shoot = true) then (Drawer3D.renderShotgunBlast windows_info; shoot := false;) 
+            
+            
         );
         Sdlrender.render_present windows_info.render;
     ) in
@@ -103,6 +116,7 @@ let () =
     in
 
     let rec main_loop () =
+        
         event_loop ();
         Player.update_pos level;
         render ();
@@ -110,4 +124,13 @@ let () =
         main_loop ()
 
     in
+
+    let  rec thread_ennemi a = 
+        print_string("THREAD \n");
+        Thread.delay 0.5 ;
+        Enemy.actionEnemy level; 
+        thread_ennemi a
+    in
+    let z = Thread.create (thread_ennemi ) 4 in 
+
     main_loop ()

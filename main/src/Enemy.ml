@@ -2,7 +2,7 @@ open Ast
 
 
 
-let approach (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, déplacement map = 1 *)
+let approach (level:level) (enemy : enemy)  = 
     if(level.player.pos.x >= enemy.pos.x) then( 
         enemy.pos <- {
             x = enemy.pos.x +. 0.08;
@@ -39,7 +39,9 @@ let approach (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, dépl
         };
         view_angle = (level.player.view_angle );
         hp = level.player.hp - 5;
-        }; 
+        velocity = level.player.velocity;
+        acceleration = level.player.acceleration;
+    }; 
         print_string("You've been dealt 5 HP\n");
         if level.player.hp = 0 then (
             print_string("You lost\n");
