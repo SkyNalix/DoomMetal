@@ -2,17 +2,9 @@ open Ast
 
 open Sdlevent
 
-
-let vector_scalar_mult v s =
-    {x=v.x *. s; y=v.y *. s}
-
-let vector_add v1 v2 =
-    {x= v1.x +. v2.x; y= v1.y +. v2.y}
-
-
 let proc_events windows_info (level:level) event : unit = 
     let player = level.player in
-    let radians = (float_of_int level.player.view_angle) *. (Float.pi /. 180.) in
+    let radians = Common.degToRad player.view_angle in
     let x_change = sin radians *. 0.1 in
     let y_change = cos radians *. 0.1 in
 
@@ -37,17 +29,16 @@ let proc_events windows_info (level:level) event : unit =
     | KeyUp { keycode = Sdlkeycode.Q } | KeyUp { keycode = Sdlkeycode.D }->
         player.acceleration.x <- 0.;
 
-
     | KeyDown { keycode = Sdlkeycode.Left } -> 
-        level.player.view_angle <- level.player.view_angle + 15;
+        level.player.view_angle <- mod_float (level.player.view_angle +. 15.) 360.;
     | KeyDown { keycode = Sdlkeycode.Right } -> 
-        level.player.view_angle <- level.player.view_angle - 15;
+        level.player.view_angle <- mod_float (level.player.view_angle -. 15.) 360.;
         
     | Mouse_Motion e -> 
         if e.mm_xrel < 0 then
-            level.player.view_angle <- level.player.view_angle + 1
+            level.player.view_angle <- mod_float (level.player.view_angle +. 1.) 360.
         else if e.mm_xrel > 0 then
-            level.player.view_angle <- level.player.view_angle - 1;
+            level.player.view_angle <- mod_float (level.player.view_angle -. 1.) 360.;
         Sdlmouse.warp_in_window windows_info.window ~x:500 ~y:500;
 
     | KeyDown { keycode = Sdlkeycode.Space} ->
@@ -67,6 +58,7 @@ let () =
         ("sky", "sky.bmp");
         ("white_bricks", "white_bricks.bmp" );
         ("red_bricks", "red_bricks.bmp");
+        ("enemy", "enemy.bmp");
     ] in
     let textures = List.map (fun (k, v) -> 
         k, Sdltexture.create_from_surface windows_info.render 

@@ -4,7 +4,7 @@ level {
             x= 4.5
             y= 4.5
         }
-        view_angle =180
+        view_angle = 180.0
         hp = 10
     }
     enemies {
@@ -12,6 +12,13 @@ level {
             pos {
                 x= 4.5
                 y= 2.5
+            }
+            hp = 1 
+        }
+        enemy {
+            pos {
+                x= 6.5
+                y= 6.5
             }
             hp = 1 
         }

@@ -1,6 +1,7 @@
 open Ast
 
-let raycast_on_angle level (rayDir:fixed_position) =
+let raycast_on_angle level rayDir
+ =
     let plot = level.map.plot in
     let player_pos = level.player.pos in
 
@@ -55,9 +56,8 @@ let raycast_on_angle level (rayDir:fixed_position) =
         else (sideDist.y -. deltaDist.y);
     ) in
     
-    let touched_pos : fixed_position = {x=map.x; y=map.y} in
     (* coordonnées exactles du points de colision *)
-    let intersection : fixed_position = {
+    let intersection = {
         x=(player_pos.x +. (rayDir.x *. perpWallDist));
         y=(player_pos.y +. (rayDir.y *. perpWallDist))
     } in
@@ -65,23 +65,14 @@ let raycast_on_angle level (rayDir:fixed_position) =
     (
         hit,
         perpWallDist, 
-        touched_pos,
+        map,
         intersection
     );;
 
 
 let aux_raycast level angle angle_min angle_max angle_step =
 
-
-    let radians = angle *. (Float.pi /. 180.) in
-    let rayDir : fixed_position = 
-        let vec_x = sin radians *. (float_of_int level.map.width)  in
-        let vec_y = cos radians *. (float_of_int level.map.height) in
-        let vec_length = sqrt (vec_x *. vec_x +. vec_y *. vec_y) in
-        {
-          x = (vec_x /. vec_length); 
-          y = (vec_y /. vec_length)
-        } in
+    let rayDir = Player.viewAngleAsVec angle in
 
     let (rayTouched,distance,touched_pos,intersection) 
         = raycast_on_angle level rayDir in
@@ -109,8 +100,9 @@ let rec raycast_rec level (angle_min:float) (angle_max:float) (step:float) (cur_
 
 
 let raycast level = 
-    let angle = float_of_int level.player.view_angle in
-    raycast_rec level (angle-.25.) (angle+.25.) 0.4 (angle-.25.) []
+    let angle = level.player.view_angle in
+    let fov = level.player.fov in
+    raycast_rec level (angle-. fov) (angle+. fov) 0.4 (angle-. fov) []
     ;;
 
 

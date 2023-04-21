@@ -4,6 +4,7 @@ open Ast
 let white = 255,255,255;;
 let black = 0,0,0;;
 let red = 255,0,0;;
+let orange = 255,165,0;;
 let blue = 0,0,255;;
 let grey = 105,105,105;;
 let green = 0,255,0;;
@@ -39,8 +40,8 @@ let render windows_info level rays =
         Sdlrender.draw_line2 
             windows_info.render
             ~p1:(
-                int_of_float (ray.angle_vec.x *. (float_of_int block_width)), 
-                int_of_float (ray.angle_vec.y *. (float_of_int block_height)))
+                player_posX + int_of_float (ray.angle_vec.x *. 999.), 
+                player_posY + int_of_float (ray.angle_vec.y *. 999.))
             ~p2:(player_posX, player_posY);
     in
 
@@ -58,22 +59,18 @@ let render windows_info level rays =
     in
 
     let drawLiving pos color : unit =
-        let x_full = int_of_float pos.x in
-        let y_full = int_of_float pos.y in
-        let x_decimal = pos.x -. (float_of_int x_full) in 
-        let y_decimal = pos.y -. (float_of_int y_full) in 
-        let x2 = ((int_of_float (x_decimal *. 100.))*block_width)/100 in
-        let y2 = ((int_of_float (y_decimal *. 100.))*block_height)/100 in
-
+        let sz = 10 in
+        let x = int_of_float (pos.x *. float_of_int block_width) - sz/2 in
+        let y = int_of_float (pos.y *. float_of_int block_height) - sz/2 in
         Sdlrender.set_draw_color windows_info.render ~rgb:color ~a:255 ;
         let rect = Sdlrect.make 
-                ~pos:(x_full*block_height + x2, y_full*block_width + y2)
-                ~dims:(block_width/10, block_height/10) in
+                ~pos:(x, y)
+                ~dims:(sz, sz) in
         Sdlrender.fill_rect windows_info.render rect
     in
 
     drawPlot 0 0 ;
     List.iter (fun ray -> drawRay ray) rays;
     drawLiving player_pos white;
-    List.iter (fun enemy -> drawLiving enemy.pos red) level.enemies;
+    List.iter (fun enemy -> drawLiving enemy.pos orange) level.enemies;
     ();;
