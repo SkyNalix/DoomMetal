@@ -44,12 +44,13 @@ level:
 
 player:
 	| 	position
-		VIEW_ANGLE EQ INT 
+		VIEW_ANGLE EQ FLOAT 
 		HP EQ INT 
 			{
 				{
 					pos = $1;
 					view_angle = $4;
+					fov = 25.;
 					hp = $7;
 					velocity = {x=0.;y=0.};
 					acceleration = {x=0.;y=0.};

@@ -1,5 +1,7 @@
 open Ast
 
+let degToRad f = 
+    f *.( Float.pi /. 180.)
 
 let floatToInt x = 
     let sub = int_of_float(x) in 
