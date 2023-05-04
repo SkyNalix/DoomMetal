@@ -36,7 +36,8 @@ let viewAngleAsVec view_angle =
       y = (vec_y /. vec_length)
     }
 
-let update_pos level =
+let update_pos game =
+    let level = game.level in
     let vector_scalar_mult v s =
         {x=v.x *. s; y=v.y *. s} in
     
@@ -75,6 +76,9 @@ let update_pos level =
     let new_pos_colision =vector_add player.pos (vector_scalar_mult new_pos 1.4) in
     let new_pos_int_x = int_of_float new_pos_colision.x in
     let new_pos_int_y = int_of_float new_pos_colision.y in
+    if level.map.plot.(new_pos_int_y).(new_pos_int_x) <> NOTHING then (
+        Level.touchedBlockAction game new_pos_int_x new_pos_int_y;
+    );
     if level.map.plot.(new_pos_int_y).(new_pos_int_x) <> NOTHING then (
         if level.map.plot.(new_pos_int_y).(player_x) = NOTHING then (
             new_pos.x <- 0.;

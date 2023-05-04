@@ -3,6 +3,8 @@ type tile =
   | WALL
   | RED_WALL
   | TRANSPARENT_WALL
+  | DOOR
+  | LEVEL_END
 
 type floor_tile = 
   | NORMAL
@@ -40,6 +42,13 @@ type level = {
   player : player; 
   mutable enemies : enemy list;
   map : map
+}
+
+type level_state = MAIN_MENU | PLAYING | LEVEL_FINISHED
+
+type game = {
+  mutable state : level_state;
+  mutable level : level
 }
 
 type parameters =  {

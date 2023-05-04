@@ -11,7 +11,7 @@ rule main = parse
   | ignore+         { main lexbuf }
   | "level"         { LEVEL }
   | "player"        { PLAYER }
-  | "pos"       	  { POS      }
+  | "pos"       	  { POS }
   | "view_angle"    { VIEW_ANGLE }
   | "hp"       	    { HP }
   | "plot"          { PLOT }
@@ -20,6 +20,7 @@ rule main = parse
   | "map"           { MAP }
   | "ceiling"       { CEILING }
   | "floor"         { FLOOR }
+  | "fov"           { FOV }
   | "="             { EQ }
   | "x"             { X }
   | "y"             { Y }
@@ -29,4 +30,4 @@ rule main = parse
   | float as f      { FLOAT (float_of_string f) }
   | int as n	      { INT (int_of_string n) }
   | eof					    { EOF }
-  | _ as c               { Printf.printf "------ '%c'\n" c; failwith "unexpected character." }
+  | _               { failwith "unexpected character." }
