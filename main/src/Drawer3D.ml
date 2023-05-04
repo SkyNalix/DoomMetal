@@ -4,6 +4,8 @@ open Ast
 let texture_to_plot_tile textures = function
 | WALL -> List.assoc "white_bricks" textures
 | RED_WALL -> List.assoc "red_bricks" textures
+| DOOR -> List.assoc "door" textures
+| LEVEL_END -> List.assoc "level_end" textures
 | NOTHING -> failwith "no texture for NOTHING"
 | TRANSPARENT_WALL ->  failwith "no texture for TRANSPARENT_WALL"
 

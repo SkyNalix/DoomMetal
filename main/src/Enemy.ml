@@ -68,7 +68,7 @@ let getRenderInfo (player:player) enemy =
     let player_angle_vec = Player.viewAngleAsVec player.view_angle in
 
     let diff_angle = angle player_angle_vec {x=dx;y=dy} in
-    let in_fov = diff_angle <= 25.0 in
+    let in_fov = (Float.neg player.fov) < diff_angle && diff_angle <= player.fov in
     let playerEnemyDistance = (
         let x = Float.abs (enemy.pos.x -. player.pos.x) in
         let y = Float.abs (enemy.pos.y -. player.pos.y) in
