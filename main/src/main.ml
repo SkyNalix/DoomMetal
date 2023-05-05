@@ -63,7 +63,14 @@ let proc_playing_events windows_info (level:level) event =
         Sdlmouse.warp_in_window windows_info.window ~x:500 ~y:500;
 
     | KeyDown { keycode = Sdlkeycode.Space} ->
-        Player.shoot y_change x_change level level.player level.enemies  
+        if(!Drawer3D.reload = false) then(
+            Drawer3D.reload := true ;  
+            print_string "dans if"; 
+                
+            let time_now = Unix.localtime (Unix.time ()) in 
+            Drawer3D.sec_fin := float_of_int time_now.tm_sec +. 2.0;
+            Player.shoot y_change x_change level level.player level.enemies  ) 
+        else ()
 
     | Quit _ ->
         Sdl.quit ();
@@ -87,6 +94,14 @@ let () =
         ("door", "door.bmp");
         ("level_end", "level_end.bmp");
         ("enemy", "enemy.bmp");
+        ("hud", "hud.bmp");
+        ("arme", "arme.bmp");
+        ("20PV", "20PV.bmp");
+        ("15PV", "15PV.bmp");
+        ("10PV", "10PV.bmp");
+        ("5PV", "5PV.bmp");
+        ("0PV", "0PV.bmp");
+        ("shotgun_blast","shotgun_blast.bmp");
     ] in
     let textures = List.map (fun (k, v) -> 
         k, Sdltexture.create_from_surface windows_info.render 
@@ -157,4 +172,13 @@ let () =
         main_loop ()
 
     in
+
+    let  rec thread_ennemi a = 
+        print_string("THREAD \n");
+        Thread.delay 0.5 ;
+        Enemy.actionEnemy game.level; 
+        thread_ennemi a
+    in
+    let z = Thread.create (thread_ennemi ) 4 in
     main_loop ()
+    
