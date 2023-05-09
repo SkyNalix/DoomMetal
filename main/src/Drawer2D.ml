@@ -17,6 +17,7 @@ let color_of_wall = function
 
 let render windows_info level rays = 
     let plot = level.map.plot in
+    let view_angle = level.player.view_angle in
     let player_pos = level.player.pos in
 
     let block_width = (windows_info.drawer2D_width / level.map.width) in
@@ -36,7 +37,12 @@ let render windows_info level rays =
                 ~dims:(block_width, block_height) in
         Sdlrender.fill_rect windows_info.render rect;
 
-        Sdlrender.set_draw_color windows_info.render ~rgb:grey ~a:255 ;
+        let color = (
+            if view_angle -. 5. <  ray.angle && ray.angle < view_angle +. 5. then
+                red
+            else grey 
+        ) in
+        Sdlrender.set_draw_color windows_info.render ~rgb:color ~a:255 ;
         Sdlrender.draw_line2 
             windows_info.render
             ~p1:(

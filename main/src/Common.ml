@@ -1,13 +1,29 @@
 open Ast
 
+let quit() =
+    Sdl.quit ();
+    Sdlttf.quit ();
+    exit 0
+
 let degToRad f = 
     f *.( Float.pi /. 180.)
+
+
+let angleAsVec view_angle =
+    let radians = degToRad view_angle in
+    let vec_x = sin radians *. 99. in
+    let vec_y = cos radians *. 99. in
+    let vec_length = sqrt (vec_x *. vec_x +. vec_y *. vec_y) in
+    {
+      x = (vec_x /. vec_length); 
+      y = (vec_y /. vec_length)
+    };;
+
 
 let floatToInt x = 
     let sub = int_of_float(x) in 
     if (x -. float_of_int(sub) >= 0.5 ) then sub+1 else sub 
 ;;
-
 let toucheUnMur x y (level : level)=
     match level.map.plot.(floatToInt y).(floatToInt x) with 
     | NOTHING -> false 

@@ -248,7 +248,7 @@ let drawRay windows_info level textures ray =
 
     
 
-let renderEnemy windows_info textures enemy =
+let renderEnemy windows_info level textures enemy =
     if enemy.in_fov then (
 
         let text_height = 
@@ -259,7 +259,7 @@ let renderEnemy windows_info textures enemy =
             int_of_float (float_of_int windows_info.drawer3D_width *. (0.5 /. enemy.playerEnemyDistance)) in
 
         let win_step = 
-            int_of_float (float_of_int windows_info.drawer3D_width /. ((enemy.fov *. 2.))) in
+            int_of_float (float_of_int windows_info.drawer3D_width /. ((level.player.fov *. 2.))) in
         let sx = (windows_info.drawer3D_width/2 + win_step*(int_of_float enemy.diff_angle)) - text_width/2 in
         
         let offsetY = int_of_float (50. /. enemy.playerEnemyDistance) in
@@ -292,10 +292,10 @@ let render windows_info level textures rays =
         match rays, enemies with
         | [], [] -> ()
         | ray :: r1, [] -> drawRay windows_info level textures ray; render_rays_and_enemies r1 []
-        | [], t :: r2 -> renderEnemy windows_info textures t; render_rays_and_enemies [] r2
+        | [], t :: r2 -> renderEnemy windows_info level textures t; render_rays_and_enemies [] r2
         | ray :: r1, enemy :: r2 -> 
             if ray.distance < enemy.playerEnemyDistance then (
-                renderEnemy windows_info textures enemy;
+                renderEnemy windows_info level textures enemy;
                 render_rays_and_enemies rays r2
             ) else (
                 drawRay windows_info level textures ray;
@@ -303,7 +303,7 @@ let render windows_info level textures rays =
             )
     in 
 
-    let enemies = List.map (Enemy.getRenderInfo level.player) level.enemies in
+    let enemies = List.map (Enemy.computeInfo level.player) level.enemies in
     let enemies = List.filter (fun e -> e.in_fov) enemies in
     let enemies = List.fast_sort ( fun e1 e2 ->
                 if e1.playerEnemyDistance > e2.playerEnemyDistance then -1 else 1) enemies in

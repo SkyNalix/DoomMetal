@@ -2,7 +2,7 @@ level {
     player {
         pos {
             x= 4.5
-            y= 4.5
+            y= 5.5
         }
         view_angle = 180.0
         fov = 25.0
@@ -13,6 +13,13 @@ level {
             pos {
                 x= 6.5
                 y= 6.5
+            }
+            hp = 1 
+        }
+        enemy {
+            pos {
+                x= 4.5
+                y= 4.5
             }
             hp = 1 
         }

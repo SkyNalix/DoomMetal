@@ -2,35 +2,37 @@ open Ast
 
 open Sdlevent
 
+
 let proc_main_menu_events game event = 
     match event with
     | KeyDown { keycode = Sdlkeycode.Escape } ->
-        Sdl.quit ();
-        exit 0
+        Common.quit()
     | KeyDown { keycode = Sdlkeycode.Return } ->
         game.state <- PLAYING;
-        game.level <- Level.get "1"
+        game.level <- Some (Level.get (string_of_int game.selected_level))
+    | KeyDown { keycode = Sdlkeycode.Left } -> 
+        if game.selected_level > 1 then
+            game.selected_level <- game.selected_level - 1
+    | KeyDown { keycode = Sdlkeycode.Right } -> 
+        if game.selected_level < game.nb_levels then
+            game.selected_level <- game.selected_level + 1
+        
     | _ -> ()
 
 let proc_level_finished_events game event = 
     match event with
     | KeyDown { keycode = Sdlkeycode.Escape } ->
-        Sdl.quit ();
-        exit 0
+        Common.quit()
     | KeyDown { keycode = Sdlkeycode.Return } ->
         game.state <- MAIN_MENU
     | _ ->  ()
 
 let proc_playing_events windows_info (level:level) event = 
     let player = level.player in
-    let radians = Common.degToRad player.view_angle in
-    let x_change = sin radians *. 0.1 in
-    let y_change = cos radians *. 0.1 in
 
     match event with 
     | KeyDown { keycode = Sdlkeycode.Escape } ->
-        Sdl.quit ();
-        exit 0
+        Common.quit()
 
         
     | KeyDown { keycode = Sdlkeycode.Z } -> 
@@ -69,62 +71,66 @@ let proc_playing_events windows_info (level:level) event =
                 
             let time_now = Unix.localtime (Unix.time ()) in 
             Drawer3D.sec_fin := float_of_int time_now.tm_sec +. 2.0;
-            Player.shoot y_change x_change level level.player level.enemies  ) 
+            Player.shoot level ) 
         else ()
 
     | Quit _ ->
-        Sdl.quit ();
-        exit 0
+        Common.quit()
     | _ -> ()
     
-
 let () =
-    let game = {
-        state = MAIN_MENU;
-        level = Level.get "1";
-    } in
+    Sdlttf.init();
     let windows_info = Common.make_default_windows_info () in
-    let textures_path = "main/resources/textures/" in
-    let textures = [
-        ("main_menu", "main_menu.bmp");
-        ("you_escaped", "you_escaped.bmp");
-        ("sky", "sky.bmp");
-        ("white_bricks", "white_bricks.bmp" );
-        ("red_bricks", "red_bricks.bmp");
-        ("door", "door.bmp");
-        ("level_end", "level_end.bmp");
-        ("enemy", "enemy.bmp");
-        ("hud", "hud.bmp");
-        ("arme", "arme.bmp");
-        ("20PV", "20PV.bmp");
-        ("15PV", "15PV.bmp");
-        ("10PV", "10PV.bmp");
-        ("5PV", "5PV.bmp");
-        ("0PV", "0PV.bmp");
-        ("shotgun_blast","shotgun_blast.bmp");
-    ] in
+    let font = Sdlttf.open_font ~file:"main/resources/doom.ttf" ~ptsize:40 in
+
+    let textures = (
+        let filename = "main/resources/textures.txt" in
+        LevelParser.strings LevelLexer.main (Lexing.from_channel (open_in filename))
+    ) in
     let textures = List.map (fun (k, v) -> 
         k, Sdltexture.create_from_surface windows_info.render 
-                (Sdlsurface.load_bmp ~filename:(textures_path^v))) textures in
+                (Sdlsurface.load_bmp ~filename:("main/resources/textures/" ^ v))) textures in
+                
+    let texts = (
+        let filename = "main/resources/texts.txt" in
+        LevelParser.strings LevelLexer.main (Lexing.from_channel (open_in filename))
+    ) in
+    let texts = List.map (fun (k, text) -> 
+            let surf = Sdlttf.render_text_solid font ~text ~color:{ Sdlttf.r = 255; g = 0; b = 0; a = 0 } in
+            let texture = Sdltexture.create_from_surface windows_info.render surf in
+            k, texture
+        ) texts in
+
+    let game = {
+        state = MAIN_MENU;
+        level = None;
+        windows_info = windows_info;
+        textures = textures;
+        texts = texts;
+        selected_level = 1;
+        nb_levels = (Array.length (Sys.readdir "main/resources/levels/"));
+    } in
+
 
     let fps = 1000/60 in
 
     let renderLevel () = (
         Player.update_pos game;
         (* Enemy.actionEnemy level; *)
-        let rays = Raycasting.raycast game.level in
+        let rays = Raycasting.raycast (Option.get game.level) in
         let rays = List.sort (fun r1 r2 -> 
             if r1.distance > r2.distance then -1
             else if r1.distance < r2.distance then 1
             else 0 ) rays in
 
         if windows_info.parameters.drawer2D then (
-            Drawer2D.render windows_info game.level rays;
+            Drawer2D.render windows_info (Option.get game.level) rays;
         ) else (
-            Drawer3D.render windows_info game.level textures rays;
+            Drawer3D.render windows_info (Option.get game.level) textures rays;
         );
         Sdlrender.render_present windows_info.render;
     ) in
+
 
     let renderMainMenu () = (
         Sdlrender.copyEx 
@@ -134,6 +140,15 @@ let () =
             ~dst_rect:(Sdlrect.make ~pos:(0,0) 
                 ~dims:(windows_info.width, windows_info.height))
         ();
+
+        let dst_rect = Sdlrect.make4 ~x:0 ~y:0 ~w:200 ~h:200 in 
+        Sdlrender.copyEx 
+            windows_info.render 
+            ~texture:(List.assoc ("level " ^ (string_of_int game.selected_level)) game.texts)
+            ~src_rect:dst_rect
+            ~dst_rect:dst_rect 
+            ();
+        ()
     ) in
 
     let renderLevelFinish () = (
@@ -151,7 +166,7 @@ let () =
             | Some ev -> 
                 (match game.state with 
                     | MAIN_MENU -> proc_main_menu_events game ev
-                    | PLAYING -> proc_playing_events windows_info game.level ev
+                    | PLAYING -> proc_playing_events windows_info (Option.get game.level) ev
                     | LEVEL_FINISHED -> proc_level_finished_events game ev
                 );
                 event_loop ()
@@ -176,7 +191,7 @@ let () =
     let  rec thread_ennemi a = 
         print_string("THREAD \n");
         Thread.delay 0.5 ;
-        Enemy.actionEnemy game.level; 
+        Enemy.actionEnemy (Option.get game.level); 
         thread_ennemi a
     in
     let z = Thread.create (thread_ennemi ) 4 in

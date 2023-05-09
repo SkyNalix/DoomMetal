@@ -23,12 +23,21 @@ let floor_tile_of_int n =
 %token MAP CEILING FLOOR FOV
 %token <int> INT
 %token <float> FLOAT
+%token <string> STRING
 
 %start level
 %type<Ast.level> level
 %type<Ast.player> player
 %type<Ast.tile list> plotCells
+
+%start strings
+%type<(string * string) list> strings
+
 %%
+
+strings:
+	| 							{ [] }
+	| STRING EQ STRING strings { ($1, $3) :: $4 }
 
 level:
 	| 	LEVEL LBRACKET

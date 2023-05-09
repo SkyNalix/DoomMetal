@@ -72,7 +72,7 @@ let raycast_on_angle level rayDir
 
 let aux_raycast level angle angle_min angle_max angle_step =
 
-    let rayDir = Player.viewAngleAsVec angle in
+    let rayDir = Common.angleAsVec angle in
 
     let (rayTouched,distance,touched_pos,intersection) 
         = raycast_on_angle level rayDir in

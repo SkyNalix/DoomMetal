@@ -46,10 +46,6 @@ type level = {
 
 type level_state = MAIN_MENU | PLAYING | LEVEL_FINISHED
 
-type game = {
-  mutable state : level_state;
-  mutable level : level
-}
 
 type parameters =  {
   debug : bool;
@@ -82,8 +78,17 @@ type ray = {
 
 type enemy_render_info = {
   enemy : enemy; 
-  fov : float; 
   diff_angle : float; 
   in_fov : bool; 
   playerEnemyDistance : float; 
+}
+
+type game = {
+  mutable state : level_state;
+  mutable level : level option;
+  windows_info : windows_info;
+  textures : (string * Sdltexture.t) list;
+  texts : (string * Sdltexture.t) list;
+  mutable selected_level : int;
+  nb_levels : int;
 }
