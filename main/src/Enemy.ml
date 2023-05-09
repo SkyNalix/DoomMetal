@@ -25,8 +25,7 @@ let approach (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, dépl
         print_string("You've been dealt 5 HP\n");
         if level.player.hp = 0 then (
             print_string("You lost\n");
-            Sdl.quit ();
-            exit 0
+            Common.quit()
         )
     )
 ;;
@@ -54,7 +53,7 @@ let actionEnemy (level : level) =
 ;;
 
 
-let getRenderInfo (player:player) enemy =
+let computeInfo (player:player) enemy =
     let angle v1 v2 = (
         let dot = (v1.x *. v2.x) +. (v1.y *. v2.y) in
         let n1 = sqrt ((v1.x *. v1.x) +. (v1.y *. v1.y)) in
@@ -65,7 +64,7 @@ let getRenderInfo (player:player) enemy =
 
     let dx = (enemy.pos.x -. player.pos.x) in
     let dy = (enemy.pos.y -. player.pos.y) in
-    let player_angle_vec = Player.viewAngleAsVec player.view_angle in
+    let player_angle_vec = Common.angleAsVec player.view_angle in
 
     let diff_angle = angle player_angle_vec {x=dx;y=dy} in
     let in_fov = (Float.neg player.fov) < diff_angle && diff_angle <= player.fov in
@@ -74,7 +73,6 @@ let getRenderInfo (player:player) enemy =
         let y = Float.abs (enemy.pos.y -. player.pos.y) in
         sqrt(x *. x +. y *. y)
     ) in {
-        fov=player.fov;
         diff_angle=diff_angle;
         in_fov=in_fov;
         playerEnemyDistance=playerEnemyDistance;

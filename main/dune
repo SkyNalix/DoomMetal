@@ -4,7 +4,7 @@
 (executable
   (public_name DoomMetal)
   (name main)
-  (libraries tsdl sdl2)
+  (libraries tsdl sdl2 sdl2_ttf)
 )
 
 (ocamllex LevelLexer)

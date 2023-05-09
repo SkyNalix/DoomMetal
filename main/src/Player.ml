@@ -1,43 +1,24 @@
 open Ast
 
-let rec shoot y_change x_change level (player:player) enemies = 
-  let px = player.pos.x in
-  let py = player.pos.y in
-  let rec aux liste  =
-      match liste with
-      | [] -> ()
-      | enn  :: l ->  
-          if Common.arrondir enn.pos.y py 0.35 && (Common.arrondir enn.pos.x px 0.35) then (
-              enn.hp <- enn.hp -1; 
-              level.enemies <- List.filter (fun enn -> enn.hp > 0) level.enemies
-          ) else aux l
-  in
+let shoot level = 
+  let enemies_info = List.map (Enemy.computeInfo level.player) level.enemies in
+  let enemies_info = List.filter (fun info -> info.in_fov
+                    && -.5. < info.diff_angle && info.diff_angle < 5. 
+                    && (
+                      let enemy_angle = level.player.view_angle +. info.diff_angle in
+                      let enemy_angleVec = Common.angleAsVec enemy_angle in
+                      let (_,distance,_,_) = Raycasting.raycast_on_angle level enemy_angleVec in
+                      info.playerEnemyDistance < distance
+                    )  ) enemies_info in
+  List.iter (fun info ->
+      info.enemy.hp <- info.enemy.hp -1; 
+    ) enemies_info;
+  level.enemies <- List.filter (fun enn -> enn.hp > 0) level.enemies;;
 
-  if py < 8. && py > 0. && px > 0. && px < 8. && (Common.toucheUnMur px py level) = false then (
-      aux enemies;
-      let player = {
-          player with 
-          pos = {
-              x=(px +. x_change);
-              y=(py +. y_change);
-          }
-      } in
-      shoot y_change x_change level player enemies 
-  );
-;;
 
-let viewAngleAsVec view_angle =
-    let radians = Common.degToRad view_angle in
-    let vec_x = sin radians *. 99. in
-    let vec_y = cos radians *. 99. in
-    let vec_length = sqrt (vec_x *. vec_x +. vec_y *. vec_y) in
-    {
-      x = (vec_x /. vec_length); 
-      y = (vec_y /. vec_length)
-    }
 
 let update_pos game =
-    let level = game.level in
+    let level = Option.get game.level in
     let vector_scalar_mult v s =
         {x=v.x *. s; y=v.y *. s} in
     

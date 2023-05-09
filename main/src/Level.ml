@@ -5,10 +5,11 @@ let get level =
   LevelParser.level LevelLexer.main (Lexing.from_channel (open_in filename))
 
 let touchedBlockAction game x y = 
-  match game.level.map.plot.(y).(x) with
-    | DOOR -> game.level.map.plot.(y).(x) <- NOTHING
+  let level = Option.get game.level in
+  match level.map.plot.(y).(x) with
+    | DOOR -> level.map.plot.(y).(x) <- NOTHING
     | LEVEL_END -> 
       game.state <- LEVEL_FINISHED;
-      game.level <- get "1";
+      game.level <- Some (get "1");
     | _ -> ()
   ;;
