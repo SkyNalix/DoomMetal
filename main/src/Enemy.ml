@@ -22,9 +22,7 @@ let approach (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, dépl
       Common.arrondir enemy.pos.y level.player.pos.y 0.15) 
     then (  
         level.player.hp <- level.player.hp - 5; 
-        print_string("You've been dealt 5 HP\n");
         if level.player.hp = 0 then (
-            print_string("You lost\n");
             Common.quit()
         )
     )

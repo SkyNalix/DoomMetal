@@ -142,7 +142,6 @@ let drawRay windows_info level textures ray =
     ;;
     
     let renderShotgunBlast windows_info = 
-        print_string("SHOT");
         let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
         let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
     
@@ -219,8 +218,6 @@ let drawRay windows_info level textures ray =
     ;;
     
     let renderReloadPart3 windows_info = 
-        print_string "hey \n";
-    
         let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
         let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
     

@@ -16,13 +16,6 @@ level {
             }
             hp = 1 
         }
-        enemy {
-            pos {
-                x= 4.5
-                y= 4.5
-            }
-            hp = 1 
-        }
     }
     map {
         ceiling = 0

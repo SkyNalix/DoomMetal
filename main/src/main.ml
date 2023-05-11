@@ -67,7 +67,6 @@ let proc_playing_events windows_info (level:level) event =
     | KeyDown { keycode = Sdlkeycode.Space} ->
         if(!Drawer3D.reload = false) then(
             Drawer3D.reload := true ;  
-            print_string "dans if"; 
                 
             let time_now = Unix.localtime (Unix.time ()) in 
             Drawer3D.sec_fin := float_of_int time_now.tm_sec +. 2.0;
@@ -189,7 +188,6 @@ let () =
     in
 
     let  rec thread_ennemi a = 
-        print_string("THREAD \n");
         Thread.delay 0.5 ;
         Enemy.actionEnemy (Option.get game.level); 
         thread_ennemi a
