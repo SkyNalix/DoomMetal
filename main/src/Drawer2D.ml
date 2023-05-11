@@ -1,13 +1,7 @@
 open Ast
 
 
-let white = 255,255,255;;
-let black = 0,0,0;;
-let red = 255,0,0;;
-let orange = 255,165,0;;
-let blue = 0,0,255;;
-let grey = 105,105,105;;
-let green = 0,255,0;;
+
 let color_of_wall = function
     | WALL -> white
     | RED_WALL -> red

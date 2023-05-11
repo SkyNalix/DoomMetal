@@ -44,8 +44,7 @@ type level = {
   map : map
 }
 
-type level_state = MAIN_MENU | PLAYING | LEVEL_FINISHED
-
+type level_state = MAIN_MENU | PLAYING | LEVEL_FINISHED | DIED
 
 type parameters =  {
   debug : bool;
@@ -92,3 +91,11 @@ type game = {
   mutable selected_level : int;
   nb_levels : int;
 }
+
+let white = 255,255,255;;
+let black = 0,0,0;;
+let red = 255,0,0;;
+let orange = 255,165,0;;
+let blue = 0,0,255;;
+let grey = 105,105,105;;
+let green = 0,255,0;;

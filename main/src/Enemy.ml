@@ -1,6 +1,7 @@
 open Ast
 
-let approach (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, déplacement map = 1 *)
+let approach (game:game) (enemy : enemy)  = (* Deplacement float = 0.05, déplacement map = 1 *)
+    let level = Option.get game.level in
     if(level.player.pos.x >= enemy.pos.x) then ( 
         enemy.pos.x <- enemy.pos.x +. 0.08;
         enemy.pos.y <- enemy.pos.y;
@@ -23,7 +24,7 @@ let approach (level:level) (enemy : enemy)  = (* Deplacement float = 0.05, dépl
     then (  
         level.player.hp <- level.player.hp - 5; 
         if level.player.hp = 0 then (
-            Common.quit()
+            game.state <- DIED
         )
     )
 ;;
@@ -41,14 +42,14 @@ let isInReach (player:player) (enemy : enemy) =
       player.pos.y >= enemy.pos.y && player.pos.y <= enemy.pos.y +. 1.5) then true else false   
   ) ) ) ;;
 
-let actionEnemy (level : level) = 
-  let see_Player enemy = (* Faire en sorte que les mob réagissent en cas de tir *)
-      if isInReach level.player enemy then (
-          approach level enemy
-      )
-  in
-  List.iter see_Player level.enemies;
-;;
+let actionEnemy (game : game) = 
+    let level = Option.get game.level in
+    let see_Player enemy = (* Faire en sorte que les mob réagissent en cas de tir *)
+        if isInReach level.player enemy then (
+            approach game enemy
+        )
+    in
+    List.iter see_Player level.enemies;;
 
 
 let computeInfo (player:player) enemy =

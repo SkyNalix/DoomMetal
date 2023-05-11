@@ -99,6 +99,8 @@ let () =
             let texture = Sdltexture.create_from_surface windows_info.render surf in
             k, texture
         ) texts in
+        (* use this as the src_rect in Stlrender.copyEx *)
+    let text_src_rect = Sdlrect.make ~pos:(0,0) ~dims:(1280,720) in
 
     let game = {
         state = MAIN_MENU;
@@ -115,7 +117,6 @@ let () =
 
     let renderLevel () = (
         Player.update_pos game;
-        (* Enemy.actionEnemy level; *)
         let rays = Raycasting.raycast (Option.get game.level) in
         let rays = List.sort (fun r1 r2 -> 
             if r1.distance > r2.distance then -1
@@ -144,20 +145,28 @@ let () =
         Sdlrender.copyEx 
             windows_info.render 
             ~texture:(List.assoc ("level " ^ (string_of_int game.selected_level)) game.texts)
-            ~src_rect:dst_rect
+            ~src_rect:text_src_rect
             ~dst_rect:dst_rect 
             ();
         ()
     ) in
 
-    let renderLevelFinish () = (
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:(List.assoc "you_escaped" textures)
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(1314,886))
-            ~dst_rect:(Sdlrect.make ~pos:(0,0) 
-                ~dims:(windows_info.width, windows_info.height))
-        ();
+    let renderLevelFinish message = (
+        Sdlrender.set_draw_color windows_info.render ~rgb:green ~a:255;
+        let w = windows_info.width/4 in
+        let h = windows_info.height/4 in
+        let textRect = Sdlrect.make 
+                            ~pos:(w + w/2,h + h/2)
+                            ~dims:(w, h) in
+        
+        Sdlrender.set_draw_color windows_info.render ~rgb:red ~a:255;
+        Sdlrender.copyEx
+            windows_info.render
+            ~texture:(List.assoc message game.texts)
+            ~src_rect:text_src_rect
+            ~dst_rect:textRect
+        (); 
+       
     ) in
 
     let rec event_loop () =
@@ -166,32 +175,33 @@ let () =
                 (match game.state with 
                     | MAIN_MENU -> proc_main_menu_events game ev
                     | PLAYING -> proc_playing_events windows_info (Option.get game.level) ev
-                    | LEVEL_FINISHED -> proc_level_finished_events game ev
+                    | LEVEL_FINISHED | DIED -> proc_level_finished_events game ev
                 );
                 event_loop ()
             | None -> ()
     in
 
+
     let rec main_loop () =
         event_loop ();
-        Sdlrender.set_draw_color windows_info.render ~rgb:(72,68,67) ~a:255;
+        Sdlrender.set_draw_color windows_info.render ~rgb:grey ~a:255;
         Sdlrender.clear windows_info.render;
         (match game.state with 
             | MAIN_MENU -> renderMainMenu ()
             | PLAYING -> renderLevel ()
-            | LEVEL_FINISHED -> renderLevelFinish ()
+            | LEVEL_FINISHED -> renderLevelFinish "escaped_message"
+            | DIED -> renderLevelFinish "died_message"
         );
         Sdlrender.render_present windows_info.render;
         Sdltimer.delay ~ms:(fps);
         main_loop ()
-
     in
 
-    let  rec thread_ennemi a = 
+    (* let rec thread_ennemi a = 
         Thread.delay 0.5 ;
-        Enemy.actionEnemy (Option.get game.level); 
+        Enemy.actionEnemy game; 
         thread_ennemi a
     in
-    let z = Thread.create (thread_ennemi ) 4 in
+    ignore(Thread.create (thread_ennemi ) 4); *)
     main_loop ()
     
