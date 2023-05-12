@@ -151,7 +151,6 @@ let () =
         ) else (
             Drawer3D.render game rays;
         );
-        Sdlrender.render_present windows_info.render;
     ) in
 
     let renderMainMenu () = (
