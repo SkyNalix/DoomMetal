@@ -71,11 +71,13 @@ let drawRay game ray =
 
 
 let renderHud game = 
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
     let position_hud_x = 0 in 
-    let position_hud_y = game.windows_info.drawer3D_height - game.windows_info.drawer3D_height / 5 in  
+    let position_hud_y = h - h / 5 in  
     let dst_rect = Sdlrect.make 
         ~pos:(position_hud_x,position_hud_y)
-        ~dims:(game.windows_info.drawer3D_width,200) in
+        ~dims:(w,h/5) in
 
     Sdlrender.copyEx
         game.windows_info.render 
@@ -86,28 +88,32 @@ let renderHud game =
         ();;
 
 let renderPV game level =
-    let position_hud_x = 0 in 
-    let position_hud_y = game.windows_info.drawer3D_height - game.windows_info.drawer3D_height / 5 in  
-    let pv_courant = string_of_int level.player.entity.hp in 
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w/5 in 
+    let position_hud_y = h - h / 5 in  
+    let hp = level.player.entity.hp * 100 / level.player.entity.maxHp in 
+    let hp= if hp mod 10 <> 0 then 
+        hp + (10 - (hp mod 10)) else hp in
     let dst_rect = Sdlrect.make 
-        ~pos:(position_hud_x+200,position_hud_y)
-        ~dims:(350,200) in
-    
+        ~pos:(position_hud_x,position_hud_y)
+        ~dims:(w/5,h/5) in
     Sdlrender.copyEx 
         game.windows_info.render 
-        ~texture:(List.assoc (pv_courant^"PV") game.textures) 
+        ~texture:(List.assoc (string_of_int hp) game.texts) 
         ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
         ~dst_rect: dst_rect
         ~angle:0.
         ();;
 
 let renderArme game = 
-    let position_hud_x = game.windows_info.drawer3D_width / 2 - (game.windows_info.drawer3D_width / 10) in 
-    let position_hud_y = game.windows_info.drawer3D_height - game.windows_info.drawer3D_height / 2 + 25 in      
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w / 2 - (w / 5 / 2) in 
+    let position_hud_y = h - h /5 - h/4 in      
     let dst_rect = Sdlrect.make 
         ~pos:(position_hud_x,position_hud_y)
-        ~dims:((300),210) in
-
+        ~dims:(w/5, h/4) in
     Sdlrender.copyEx 
         game.windows_info.render 
         ~texture:(List.assoc "arme" game.textures) 
@@ -117,13 +123,13 @@ let renderArme game =
         ();;
 
 let renderShotgunBlast game = 
-    let position_hud_x = game.windows_info.drawer3D_width / 2 - (game.windows_info.drawer3D_width / 10) in 
-    let position_hud_y = game.windows_info.drawer3D_height - game.windows_info.drawer3D_height / 2 + 25 in      
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w / 2 - (w / 5 / 2) in 
+    let position_hud_y = h - h/5 - h/5 in      
     let dst_rect = Sdlrect.make 
         ~pos:(position_hud_x,position_hud_y-120)
-        ~dims:((300),210) in
-    
-
+        ~dims:(w/5,h/5) in
     Sdlrender.copyEx 
         game.windows_info.render 
         ~texture:(List.assoc "shotgun_blast" game.textures) 
@@ -134,12 +140,13 @@ let renderShotgunBlast game =
 ;;
 
 let renderReload game part = 
-    let position_hud_x = game.windows_info.drawer3D_width / 2 - (game.windows_info.drawer3D_width / 10) in 
-    let position_hud_y = game.windows_info.drawer3D_height - game.windows_info.drawer3D_height / 2 + 25 in      
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w / 2 - (w/5/2) in 
+    let position_hud_y = h - h/5 - h/4 in     
     let dst_rect = Sdlrect.make 
         ~pos:(position_hud_x,position_hud_y)
-        ~dims:((300),210) in
-
+        ~dims:(w/5, h/4) in
     Sdlrender.copyEx 
         game.windows_info.render 
         ~texture:(List.assoc ("reload" ^ part) game.textures) 

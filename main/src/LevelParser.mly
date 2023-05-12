@@ -78,6 +78,8 @@ entity:
 						pos = $3;
 						view_angle = $6;
 						hp = $9;
+						maxHp = $9;
+						weapon = { lastHit = 0. };
 						velocity = {x=0.;y=0.};
 						acceleration = {x=0.;y=0.};
 					}

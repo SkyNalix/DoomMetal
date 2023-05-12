@@ -112,7 +112,6 @@ let () =
         nb_levels = (Array.length (Sys.readdir "main/resources/levels/"));
     } in
 
-
     let fps = 1000/60 in
 
     let renderLevel () = (
@@ -123,11 +122,11 @@ let () =
             if info.playerEnemyDistance < 7.0 && info.playerEnemyDistance < info.rayDistance then (
                 enemy.view_angle <- mod_float (level.player.entity.view_angle +. info.diff_angle +. 180.) 360.;
                 if info.playerEnemyDistance <= 1.5 then (
-                    (* faire reculer l'enemie du joueur *)
+                    (* faire reculer l'enemi du joueur *)
                     enemy.acceleration.x <- 0.0;
                     enemy.acceleration.y <- -1.0;
                 ) else if info.playerEnemyDistance >= 4. then (  
-                    (* faire avancer l'enemie vers le joueur *)
+                    (* faire avancer l'enemi vers le joueur *)
                     enemy.acceleration.x <- 0.0;
                     enemy.acceleration.y <- 1.0;
                 ) else (
@@ -151,6 +150,7 @@ let () =
         ) else (
             Drawer3D.render game rays;
         );
+
     ) in
 
     let renderMainMenu () = (

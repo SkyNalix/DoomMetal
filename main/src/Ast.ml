@@ -16,10 +16,16 @@ let friction_of_floor_tile = function
 
 type position = { mutable x : float; mutable y : float }
 
+type weapon = {
+  mutable lastHit: float;
+}
+
 type entity = {
   pos : position;
+  weapon: weapon;
   mutable view_angle : float;
   mutable hp : int;
+  maxHp : int;
   velocity : position;
   acceleration : position;
 }
