@@ -14,3 +14,6 @@
 "5PV"=  "5PV.bmp"
 "0PV"=  "0PV.bmp"
 "shotgun_blast"= "shotgun_blast.bmp"
+"reload1"= "reload1.bmp"
+"reload2"= "reload2.bmp"
+"reload3"= "reload3.bmp"

@@ -11,8 +11,8 @@ let color_of_wall = function
 
 let render windows_info level rays = 
     let plot = level.map.plot in
-    let view_angle = level.player.view_angle in
-    let player_pos = level.player.pos in
+    let view_angle = level.player.entity.view_angle in
+    let player_pos = level.player.entity.pos in
 
     let block_width = (windows_info.drawer2D_width / level.map.width) in
     let block_height = (windows_info.drawer2D_height / level.map.height) in

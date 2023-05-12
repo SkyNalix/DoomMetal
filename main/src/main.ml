@@ -28,7 +28,7 @@ let proc_level_finished_events game event =
     | _ ->  ()
 
 let proc_playing_events windows_info (level:level) event = 
-    let player = level.player in
+    let player = level.player.entity in
 
     match event with 
     | KeyDown { keycode = Sdlkeycode.Escape } ->
@@ -53,15 +53,15 @@ let proc_playing_events windows_info (level:level) event =
         player.acceleration.x <- 0.;
 
     | KeyDown { keycode = Sdlkeycode.Left } -> 
-        level.player.view_angle <- mod_float (level.player.view_angle +. 15.) 360.;
+        player.view_angle <- mod_float (player.view_angle +. 15.) 360.;
     | KeyDown { keycode = Sdlkeycode.Right } -> 
-        level.player.view_angle <- mod_float (level.player.view_angle -. 15.) 360.;
+        player.view_angle <- mod_float (player.view_angle -. 15.) 360.;
         
     | Mouse_Motion e -> 
         if e.mm_xrel < 0 then
-            level.player.view_angle <- mod_float (level.player.view_angle +. 1.) 360.
+            player.view_angle <- mod_float (player.view_angle +. 1.) 360.
         else if e.mm_xrel > 0 then
-            level.player.view_angle <- mod_float (level.player.view_angle -. 1.) 360.;
+            player.view_angle <- mod_float (player.view_angle -. 1.) 360.;
         Sdlmouse.warp_in_window windows_info.window ~x:500 ~y:500;
 
     | KeyDown { keycode = Sdlkeycode.Space} ->
@@ -116,21 +116,43 @@ let () =
     let fps = 1000/60 in
 
     let renderLevel () = (
-        Player.update_pos game;
-        let rays = Raycasting.raycast (Option.get game.level) in
+        let level = Option.get game.level in
+        Entity.update_pos game level.player.entity true;
+        List.iter (fun enemy -> 
+            let info = Entity.computeInfo level level.player enemy in
+            if info.playerEnemyDistance < 7.0 && info.playerEnemyDistance < info.rayDistance then (
+                enemy.view_angle <- mod_float (level.player.entity.view_angle +. info.diff_angle +. 180.) 360.;
+                if info.playerEnemyDistance <= 1.5 then (
+                    (* faire reculer l'enemie du joueur *)
+                    enemy.acceleration.x <- 0.0;
+                    enemy.acceleration.y <- -1.0;
+                ) else if info.playerEnemyDistance >= 4. then (  
+                    (* faire avancer l'enemie vers le joueur *)
+                    enemy.acceleration.x <- 0.0;
+                    enemy.acceleration.y <- 1.0;
+                ) else (
+                    enemy.acceleration.x <- 0.0;
+                    enemy.acceleration.y <- 0.0;
+                )
+            ) else (
+                enemy.acceleration.y <- 0.;
+                enemy.acceleration.x <- 0.;
+            );
+            Entity.update_pos game enemy false;
+            ) level.enemies;
+        let rays = Raycasting.raycast level in
         let rays = List.sort (fun r1 r2 -> 
             if r1.distance > r2.distance then -1
             else if r1.distance < r2.distance then 1
             else 0 ) rays in
 
         if windows_info.parameters.drawer2D then (
-            Drawer2D.render windows_info (Option.get game.level) rays;
+            Drawer2D.render windows_info level rays;
         ) else (
-            Drawer3D.render windows_info (Option.get game.level) textures rays;
+            Drawer3D.render game rays;
         );
         Sdlrender.render_present windows_info.render;
     ) in
-
 
     let renderMainMenu () = (
         Sdlrender.copyEx 
@@ -197,11 +219,5 @@ let () =
         main_loop ()
     in
 
-    (* let rec thread_ennemi a = 
-        Thread.delay 0.5 ;
-        Enemy.actionEnemy game; 
-        thread_ennemi a
-    in
-    ignore(Thread.create (thread_ennemi ) 4); *)
     main_loop ()
     

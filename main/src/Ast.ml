@@ -16,19 +16,20 @@ let friction_of_floor_tile = function
 
 type position = { mutable x : float; mutable y : float }
 
-type player = {
+type entity = {
   pos : position;
   mutable view_angle : float;
-  mutable fov : float;
   mutable hp : int;
   velocity : position;
   acceleration : position;
 }
 
-type enemy = {
-    pos : position;
-    mutable hp : int ;
-} 
+type player = {
+  mutable fov : float;
+  entity : entity
+}
+
+type enemy = entity
 
 type map = {
   ceiling : bool;
@@ -80,6 +81,7 @@ type enemy_render_info = {
   diff_angle : float; 
   in_fov : bool; 
   playerEnemyDistance : float; 
+  rayDistance : float; 
 }
 
 type game = {

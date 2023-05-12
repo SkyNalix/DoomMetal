@@ -3,7 +3,7 @@ open Ast
 let raycast_on_angle level rayDir
  =
     let plot = level.map.plot in
-    let player_pos = level.player.pos in
+    let player_pos = level.player.entity.pos in
 
     let pos = {x=player_pos.x; y=player_pos.y} in
 
@@ -100,7 +100,7 @@ let rec raycast_rec level (angle_min:float) (angle_max:float) (step:float) (cur_
 
 
 let raycast level = 
-    let angle = level.player.view_angle in
+    let angle = level.player.entity.view_angle in
     let fov = level.player.fov in
     raycast_rec level (angle-. fov) (angle+. fov) 0.4 (angle-. fov) []
     ;;

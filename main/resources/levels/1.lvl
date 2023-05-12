@@ -1,19 +1,22 @@
 level {
     player {
-        pos {
-            x= 4.5
-            y= 5.5
-        }
-        view_angle = 180.0
         fov = 25.0
-        hp = 10
+        entity {
+            pos {
+                x= 4.5
+                y= 5.5
+            }
+            view_angle = 180.0
+            hp = 10
+        }
     }
     enemies {
-        enemy {
+        entity {
             pos {
                 x= 6.5
                 y= 6.5
             }
+            view_angle = 180.0
             hp = 1 
         }
     }

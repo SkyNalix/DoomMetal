@@ -19,7 +19,7 @@ let floor_tile_of_int n =
 
 %}
 
-%token LEVEL EQ PLAYER POS VIEW_ANGLE HP PLOT SEMICOLON LBRACKET RBRACKET ENEMIES ENEMY X Y EOF
+%token LEVEL EQ PLAYER POS VIEW_ANGLE HP PLOT SEMICOLON LBRACKET RBRACKET ENEMIES ENTITY X Y EOF
 %token MAP CEILING FLOOR FOV
 %token <int> INT
 %token <float> FLOAT
@@ -54,34 +54,35 @@ level:
 	 }
 
 player:
-	| 	position
-		VIEW_ANGLE EQ FLOAT
-		FOV EQ FLOAT 
-		HP EQ INT 
+	| FOV EQ FLOAT 
+	  entity
 			{
 				{
-					pos = $1;
-					view_angle = $4;
-					fov = $7;
-					hp = $10;
-					velocity = {x=0.;y=0.};
-					acceleration = {x=0.;y=0.};
+					fov = $3;
+					entity = $4
 				}
 			}
 
 enemies:
 	|  										{ [] }
-	| ENEMY LBRACKET enemy RBRACKET enemies { $3 :: $5 }
+	| entity enemies { $1 :: $2 }
 
-enemy:
-	| 	position 
-		HP EQ INT
-		{
-			{
-				pos = $1;
-				hp = $4;
-			}
-		}
+entity:
+	| ENTITY LBRACKET 
+		position
+	    VIEW_ANGLE EQ FLOAT
+	    HP EQ INT
+	  RBRACKET
+				{
+					{
+						pos = $3;
+						view_angle = $6;
+						hp = $9;
+						velocity = {x=0.;y=0.};
+						acceleration = {x=0.;y=0.};
+					}
+				}
+
 
 position:
 	| POS LBRACKET X EQ FLOAT Y EQ FLOAT RBRACKET		{ {x=$5; y=$8} }

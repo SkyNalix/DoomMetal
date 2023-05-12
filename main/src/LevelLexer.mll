@@ -23,7 +23,7 @@ rule main = parse
   | "hp"       	 { HP }
   | "plot"       { PLOT }
   | "enemies"    { ENEMIES }
-  | "enemy"      { ENEMY }
+  | "entity"      { ENTITY }
   | "map"        { MAP }
   | "ceiling"    { CEILING }
   | "floor"      { FLOOR }
