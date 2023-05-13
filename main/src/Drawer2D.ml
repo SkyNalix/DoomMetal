@@ -6,6 +6,8 @@ let color_of_wall = function
     | WALL -> white
     | RED_WALL -> red
     | TRANSPARENT_WALL -> green
+    | DOOR -> green
+    | LEVEL_END -> violet
     | _ -> black;;
 
 

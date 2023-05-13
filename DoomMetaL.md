@@ -30,7 +30,7 @@
     - ajout et affichage des ennemies : avril
     - HUD (barre de vie, arme, munition, etc...) - avril
     - ajout des portes ou autre contenu - fin avril - debut mai
-    - Ajout de l'audio : fin avril
+    - IA des enemies : fin avril
     - ajout d'un menu principal avec selection des differents niveaux : mai
     - ajout des contrôles avec une mannette: mai
     

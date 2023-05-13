@@ -108,3 +108,4 @@ let orange = 255,165,0;;
 let blue = 0,0,255;;
 let grey = 105,105,105;;
 let green = 0,255,0;;
+let violet = 255,0,255;;
