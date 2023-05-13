@@ -9,10 +9,6 @@ let texture_to_plot_tile textures = function
 | NOTHING -> failwith "no texture for NOTHING"
 | TRANSPARENT_WALL ->  failwith "no texture for TRANSPARENT_WALL"
 
-let reload = ref false ;; 
-let sec_fin = ref 0.0;;
-
-
 let float_approx_eq f1 f2 approx = 
     f1 < (f2+.approx) && f1 > (f2-.approx)
 
@@ -227,19 +223,21 @@ let render game rays =
     renderPV game level; 
 
     (* debut animation de l'arme *)
-    let localtime = Unix.localtime (Unix.time ()) in 
-    if float_of_int (localtime.tm_sec) < !sec_fin -. 1.9 then (
-        renderShotgunBlast game;  
-        if float_of_int (localtime.tm_sec) < !sec_fin -. 1.5 then
-            renderReload game "1"
-    ) else if float_of_int (localtime.tm_sec) < !sec_fin -. 0.75 then 
-        renderReload game "2"
-    else if float_of_int (localtime.tm_sec) < !sec_fin  then 
+    let lastHit = level.player.entity.weapon.lastHit in
+    let delay = level.player.entity.weapon.delay in
+    let now = Unix.gettimeofday () in 
+    if now > lastHit +. (delay *. 0.6) then (
+        renderArme game
+    ) else if now > lastHit +. (delay *. 0.4) then (
         renderReload game "3"
-    else (
-        renderArme game; 
-        reload := false;
-    ) 
+    ) else if now > lastHit +. (delay *. 0.2) then (
+        renderReload game "2"
+    ) else (
+        renderReload game "1";
+        if now < lastHit +. (delay *. 0.2) then 
+            renderShotgunBlast game; 
+    );
     (* fin animation *)
     
     ;;
+

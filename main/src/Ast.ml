@@ -18,6 +18,7 @@ type position = { mutable x : float; mutable y : float }
 
 type weapon = {
   mutable lastHit: float;
+  mutable delay : float;
 }
 
 type entity = {
