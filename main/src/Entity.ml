@@ -109,7 +109,10 @@ let update_enemy game enemy =
             enemy.acceleration.x <- 0.0;
             enemy.acceleration.y <- 0.0;
         );
-        if Random.int 100 < 4 then
+        
+        let hit_prob = Float.max 4. (10. -. 2. *. (Float.max (abs_float level.player.entity.velocity.x) 
+                            (abs_float level.player.entity.velocity.y))) in
+        if Random.int 100 < (int_of_float hit_prob) then
             level.player.entity.hp <- level.player.entity.hp - 1;
     ) else (
         enemy.acceleration.y <- 0.;

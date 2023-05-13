@@ -86,14 +86,14 @@ let renderHud game =
 let renderPV game level =
     let w = game.windows_info.drawer3D_width in
     let h = game.windows_info.drawer3D_height in
-    let position_hud_x = w/5 + w/10 in 
-    let position_hud_y = h - h / 5 in  
+    let position_hud_x = w/5 + 50 in 
+    let position_hud_y = h - h/7 - h/25 in  
     let hp = level.player.entity.hp * 100 / level.player.entity.maxHp in 
     let hp= if hp mod 10 <> 0 then 
         hp + (10 - (hp mod 10)) else hp in
     let dst_rect = Sdlrect.make 
         ~pos:(position_hud_x,position_hud_y)
-        ~dims:(w/5,h/5) in
+        ~dims:(w/7,h/7) in
     Sdlrender.copyEx 
         game.windows_info.render 
         ~texture:(List.assoc (string_of_int hp) game.texts) 
