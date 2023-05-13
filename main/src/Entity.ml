@@ -80,7 +80,7 @@ let computeInfo level (player:player) enemy =
         sqrt(x *. x +. y *. y)
     ) in 
     let (_,rayDistance,_,_) = (
-        let enemy_angle = level.player.entity.view_angle +. diff_angle in
+        let enemy_angle = mod_float (level.player.entity.view_angle -. diff_angle) 360. in
         let enemy_angleVec = Common.angleAsVec enemy_angle in
         Raycasting.raycast_on_angle level enemy_angleVec 
     ) in
@@ -89,5 +89,30 @@ let computeInfo level (player:player) enemy =
         in_fov=in_fov;
         playerEnemyDistance=playerEnemyDistance;
         enemy=enemy;
-        rayDistance=rayDistance;
+        rayDistance=(rayDistance +. 0.3);
     }
+
+let update_enemy game enemy = 
+    let level = Option.get game.level in
+    let info = computeInfo level level.player enemy in
+    if info.playerEnemyDistance < 10.0 && info.playerEnemyDistance < info.rayDistance then (
+        enemy.view_angle <- mod_float (level.player.entity.view_angle -. info.diff_angle +. 180.) 360.;
+        if info.playerEnemyDistance <= 1.5 then (
+            (* faire reculer l'enemi du joueur si trop pret *)
+            enemy.acceleration.x <- 0.0;
+            enemy.acceleration.y <- -1.0;
+        ) else if info.playerEnemyDistance >= 3. then (  
+            (* faire avancer l'enemi vers le joueur si il est trop loin *)
+            enemy.acceleration.x <- 0.0;
+            enemy.acceleration.y <- 1.0;
+        ) else (
+            enemy.acceleration.x <- 0.0;
+            enemy.acceleration.y <- 0.0;
+        );
+        if Random.int 100 < 4 then
+            level.player.entity.hp <- level.player.entity.hp - 1;
+    ) else (
+        enemy.acceleration.y <- 0.;
+        enemy.acceleration.x <- 0.;
+    );
+    update_pos game enemy false;;

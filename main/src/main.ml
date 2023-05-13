@@ -113,41 +113,24 @@ let () =
 
     let renderLevel () = (
         let level = Option.get game.level in
-        Entity.update_pos game level.player.entity true;
-        List.iter (fun enemy -> 
-            let info = Entity.computeInfo level level.player enemy in
-            if info.playerEnemyDistance < 7.0 && info.playerEnemyDistance < info.rayDistance then (
-                enemy.view_angle <- mod_float (level.player.entity.view_angle +. info.diff_angle +. 180.) 360.;
-                if info.playerEnemyDistance <= 1.5 then (
-                    (* faire reculer l'enemi du joueur *)
-                    enemy.acceleration.x <- 0.0;
-                    enemy.acceleration.y <- -1.0;
-                ) else if info.playerEnemyDistance >= 4. then (  
-                    (* faire avancer l'enemi vers le joueur *)
-                    enemy.acceleration.x <- 0.0;
-                    enemy.acceleration.y <- 1.0;
-                ) else (
-                    enemy.acceleration.x <- 0.0;
-                    enemy.acceleration.y <- 0.0;
-                )
-            ) else (
-                enemy.acceleration.y <- 0.;
-                enemy.acceleration.x <- 0.;
-            );
-            Entity.update_pos game enemy false;
-            ) level.enemies;
-        let rays = Raycasting.raycast level in
-        let rays = List.sort (fun r1 r2 -> 
-            if r1.distance > r2.distance then -1
-            else if r1.distance < r2.distance then 1
-            else 0 ) rays in
-
-        if windows_info.parameters.drawer2D then (
-            Drawer2D.render windows_info level rays;
+        if level.player.entity.hp = 0 then (
+            game.state <- DIED;
+            game.level <- None
         ) else (
-            Drawer3D.render game rays;
-        );
+            Entity.update_pos game level.player.entity true;
+            List.iter (fun enemy -> Entity.update_enemy game enemy) level.enemies;
+        let rays = Raycasting.raycast level in
+            let rays = List.sort (fun r1 r2 -> 
+                if r1.distance > r2.distance then -1
+                else if r1.distance < r2.distance then 1
+                else 0 ) rays in
 
+            if windows_info.parameters.drawer2D then (
+                Drawer2D.render windows_info level rays;
+            ) else (
+                Drawer3D.render game rays;
+            );
+        );
     ) in
 
     let renderMainMenu () = (

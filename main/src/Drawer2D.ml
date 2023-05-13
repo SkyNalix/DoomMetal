@@ -73,4 +73,17 @@ let render windows_info level rays =
     List.iter (fun ray -> drawRay ray) rays;
     drawLiving player_pos white;
     List.iter (fun enemy -> drawLiving enemy.pos orange) level.enemies;
+
+    List.iter (fun enemy ->
+        let enemy_posX = int_of_float (float_of_int block_width *. enemy.pos.x) in
+        let enemy_posY = int_of_float (float_of_int block_height *. enemy.pos.y) in    
+        let angle_vec = Common.angleAsVec enemy.view_angle in
+        Sdlrender.set_draw_color windows_info.render ~rgb:blue ~a:255 ;
+        Sdlrender.draw_line2 
+            windows_info.render
+            ~p1:(
+                enemy_posX + int_of_float (angle_vec.x *. 100.), 
+                enemy_posY + int_of_float (angle_vec.y *. 100.))
+            ~p2:(enemy_posX, enemy_posY)
+        ) level.enemies;
     ();;

@@ -86,7 +86,7 @@ let renderHud game =
 let renderPV game level =
     let w = game.windows_info.drawer3D_width in
     let h = game.windows_info.drawer3D_height in
-    let position_hud_x = w/5 in 
+    let position_hud_x = w/5 + w/10 in 
     let position_hud_y = h - h / 5 in  
     let hp = level.player.entity.hp * 100 / level.player.entity.maxHp in 
     let hp= if hp mod 10 <> 0 then 
@@ -204,7 +204,7 @@ let render game rays =
         | ray :: r1, [] -> drawRay game ray; render_rays_and_enemies r1 []
         | [], t :: r2 -> renderEnemy game t; render_rays_and_enemies [] r2
         | ray :: r1, enemy :: r2 -> 
-            if ray.distance+.0.5 < enemy.playerEnemyDistance then (
+            if ray.distance +. 0.5 < enemy.playerEnemyDistance then (
                 renderEnemy game enemy;
                 render_rays_and_enemies rays r2
             ) else (
