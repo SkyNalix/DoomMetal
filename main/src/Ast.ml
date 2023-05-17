@@ -16,19 +16,27 @@ let friction_of_floor_tile = function
 
 type position = { mutable x : float; mutable y : float }
 
-type player = {
+type weapon = {
+  mutable lastHit: float;
+  mutable delay : float;
+}
+
+type entity = {
   pos : position;
+  weapon: weapon;
   mutable view_angle : float;
-  mutable fov : float;
   mutable hp : int;
+  maxHp : int;
   velocity : position;
   acceleration : position;
 }
 
-type enemy = {
-    pos : position;
-    mutable hp : int ;
-} 
+type player = {
+  mutable fov : float;
+  entity : entity
+}
+
+type enemy = entity
 
 type map = {
   ceiling : bool;
@@ -44,8 +52,7 @@ type level = {
   map : map
 }
 
-type level_state = MAIN_MENU | PLAYING | LEVEL_FINISHED
-
+type level_state = MAIN_MENU | PLAYING | LEVEL_FINISHED | DIED
 
 type parameters =  {
   debug : bool;
@@ -81,6 +88,7 @@ type enemy_render_info = {
   diff_angle : float; 
   in_fov : bool; 
   playerEnemyDistance : float; 
+  rayDistance : float; 
 }
 
 type game = {
@@ -92,3 +100,12 @@ type game = {
   mutable selected_level : int;
   nb_levels : int;
 }
+
+let white = 255,255,255;;
+let black = 0,0,0;;
+let red = 255,0,0;;
+let orange = 255,165,0;;
+let blue = 0,0,255;;
+let grey = 105,105,105;;
+let green = 0,255,0;;
+let violet = 255,0,255;;

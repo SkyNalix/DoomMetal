@@ -28,7 +28,7 @@ let proc_level_finished_events game event =
     | _ ->  ()
 
 let proc_playing_events windows_info (level:level) event = 
-    let player = level.player in
+    let player = level.player.entity in
 
     match event with 
     | KeyDown { keycode = Sdlkeycode.Escape } ->
@@ -53,27 +53,23 @@ let proc_playing_events windows_info (level:level) event =
         player.acceleration.x <- 0.;
 
     | KeyDown { keycode = Sdlkeycode.Left } -> 
-        level.player.view_angle <- mod_float (level.player.view_angle +. 15.) 360.;
+        player.view_angle <- mod_float (player.view_angle +. 15.) 360.;
     | KeyDown { keycode = Sdlkeycode.Right } -> 
-        level.player.view_angle <- mod_float (level.player.view_angle -. 15.) 360.;
+        player.view_angle <- mod_float (player.view_angle -. 15.) 360.;
         
     | Mouse_Motion e -> 
         if e.mm_xrel < 0 then
-            level.player.view_angle <- mod_float (level.player.view_angle +. 1.) 360.
+            player.view_angle <- mod_float (player.view_angle +. 1.) 360.
         else if e.mm_xrel > 0 then
-            level.player.view_angle <- mod_float (level.player.view_angle -. 1.) 360.;
+            player.view_angle <- mod_float (player.view_angle -. 1.) 360.;
         Sdlmouse.warp_in_window windows_info.window ~x:500 ~y:500;
 
     | KeyDown { keycode = Sdlkeycode.Space} ->
-        if(!Drawer3D.reload = false) then(
-            Drawer3D.reload := true ;  
-            print_string "dans if"; 
-                
-            let time_now = Unix.localtime (Unix.time ()) in 
-            Drawer3D.sec_fin := float_of_int time_now.tm_sec +. 2.0;
-            Player.shoot level ) 
-        else ()
-
+        let now = Unix.gettimeofday() in
+        if(player.weapon.lastHit +. player.weapon.delay < now) then(
+            player.weapon.lastHit <- now;
+            Player.shoot level
+        ) 
     | Quit _ ->
         Common.quit()
     | _ -> ()
@@ -100,6 +96,8 @@ let () =
             let texture = Sdltexture.create_from_surface windows_info.render surf in
             k, texture
         ) texts in
+        (* use this as the src_rect in Stlrender.copyEx *)
+    let text_src_rect = Sdlrect.make ~pos:(0,0) ~dims:(1280,720) in
 
     let game = {
         state = MAIN_MENU;
@@ -111,26 +109,29 @@ let () =
         nb_levels = (Array.length (Sys.readdir "main/resources/levels/"));
     } in
 
-
     let fps = 1000/60 in
 
     let renderLevel () = (
-        Player.update_pos game;
-        (* Enemy.actionEnemy level; *)
-        let rays = Raycasting.raycast (Option.get game.level) in
-        let rays = List.sort (fun r1 r2 -> 
-            if r1.distance > r2.distance then -1
-            else if r1.distance < r2.distance then 1
-            else 0 ) rays in
-
-        if windows_info.parameters.drawer2D then (
-            Drawer2D.render windows_info (Option.get game.level) rays;
+        let level = Option.get game.level in
+        if level.player.entity.hp = 0 then (
+            game.state <- DIED;
+            game.level <- None
         ) else (
-            Drawer3D.render windows_info (Option.get game.level) textures rays;
-        );
-        Sdlrender.render_present windows_info.render;
-    ) in
+            Entity.update_pos game level.player.entity true;
+            List.iter (fun enemy -> Entity.update_enemy game enemy) level.enemies;
+        let rays = Raycasting.raycast level in
+            let rays = List.sort (fun r1 r2 -> 
+                if r1.distance > r2.distance then -1
+                else if r1.distance < r2.distance then 1
+                else 0 ) rays in
 
+            if windows_info.parameters.drawer2D then (
+                Drawer2D.render windows_info level rays;
+            ) else (
+                Drawer3D.render game rays;
+            );
+        );
+    ) in
 
     let renderMainMenu () = (
         Sdlrender.copyEx 
@@ -145,20 +146,28 @@ let () =
         Sdlrender.copyEx 
             windows_info.render 
             ~texture:(List.assoc ("level " ^ (string_of_int game.selected_level)) game.texts)
-            ~src_rect:dst_rect
+            ~src_rect:text_src_rect
             ~dst_rect:dst_rect 
             ();
         ()
     ) in
 
-    let renderLevelFinish () = (
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:(List.assoc "you_escaped" textures)
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(1314,886))
-            ~dst_rect:(Sdlrect.make ~pos:(0,0) 
-                ~dims:(windows_info.width, windows_info.height))
-        ();
+    let renderLevelFinish message = (
+        Sdlrender.set_draw_color windows_info.render ~rgb:green ~a:255;
+        let w = windows_info.width/4 in
+        let h = windows_info.height/4 in
+        let textRect = Sdlrect.make 
+                            ~pos:(w + w/2,h + h/2)
+                            ~dims:(w, h) in
+        
+        Sdlrender.set_draw_color windows_info.render ~rgb:red ~a:255;
+        Sdlrender.copyEx
+            windows_info.render
+            ~texture:(List.assoc message game.texts)
+            ~src_rect:text_src_rect
+            ~dst_rect:textRect
+        (); 
+       
     ) in
 
     let rec event_loop () =
@@ -167,33 +176,27 @@ let () =
                 (match game.state with 
                     | MAIN_MENU -> proc_main_menu_events game ev
                     | PLAYING -> proc_playing_events windows_info (Option.get game.level) ev
-                    | LEVEL_FINISHED -> proc_level_finished_events game ev
+                    | LEVEL_FINISHED | DIED -> proc_level_finished_events game ev
                 );
                 event_loop ()
             | None -> ()
     in
 
+
     let rec main_loop () =
         event_loop ();
-        Sdlrender.set_draw_color windows_info.render ~rgb:(72,68,67) ~a:255;
+        Sdlrender.set_draw_color windows_info.render ~rgb:grey ~a:255;
         Sdlrender.clear windows_info.render;
         (match game.state with 
             | MAIN_MENU -> renderMainMenu ()
             | PLAYING -> renderLevel ()
-            | LEVEL_FINISHED -> renderLevelFinish ()
+            | LEVEL_FINISHED -> renderLevelFinish "escaped_message"
+            | DIED -> renderLevelFinish "died_message"
         );
         Sdlrender.render_present windows_info.render;
         Sdltimer.delay ~ms:(fps);
         main_loop ()
-
     in
 
-    let  rec thread_ennemi a = 
-        print_string("THREAD \n");
-        Thread.delay 0.5 ;
-        Enemy.actionEnemy (Option.get game.level); 
-        thread_ennemi a
-    in
-    let z = Thread.create (thread_ennemi ) 4 in
     main_loop ()
     

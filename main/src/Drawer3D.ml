@@ -9,15 +9,13 @@ let texture_to_plot_tile textures = function
 | NOTHING -> failwith "no texture for NOTHING"
 | TRANSPARENT_WALL ->  failwith "no texture for TRANSPARENT_WALL"
 
-let reload = ref false ;; 
-
-let sec_fin = ref 0.0;;
-
-
 let float_approx_eq f1 f2 approx = 
     f1 < (f2+.approx) && f1 > (f2-.approx)
 
-let drawRay windows_info level textures ray =
+let drawRay game ray =
+    let windows_info = game.windows_info in 
+    let level = Option.get game.level in 
+    let textures = game.textures in
     if not (ray.rayTouched) then (failwith "ray not touched") else
     
     let width  = windows_info.drawer3D_width in
@@ -26,7 +24,7 @@ let drawRay windows_info level textures ray =
 
 
     let distance = (* fisheye fix *)
-        let ca = (level.player.view_angle -. ray.angle) 
+        let ca = (level.player.entity.view_angle -. ray.angle) 
                     *. (Float.pi /. 180.0) in
         let ca = 
             if ca < 0. then ca +. 2. *. Float.pi 
@@ -68,187 +66,96 @@ let drawRay windows_info level textures ray =
     ();;
 
 
-    let renderHud windows_info = 
-        let position_hud_x = 0 in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 5 in  
-        
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/hud.bmp"))
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x,position_hud_y)
-            ~dims:((windows_info.drawer2D_width * 2),200) in
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-    ;;
-    
-    let renderPV windows_info level =
-        let position_hud_x = 0 in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 5 in  
-    
-        let pv_courant = string_of_int level.player.hp in 
-    
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/" ^pv_courant^"PV.bmp")) 
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x+200,position_hud_y)
-            ~dims:(350,200) in
-        
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-    
-            
-    
-        ()
-    ;;
-    
-    let renderArme windows_info = 
-        let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
-    
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/arme.bmp"))
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x,position_hud_y)
-            ~dims:((300),210) in
-        
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-    
-        
-    ;;
-    
-    let renderShotgunBlast windows_info = 
-        print_string("SHOT");
-        let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
-    
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/shotgun_blast.bmp"))
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x,position_hud_y-120)
-            ~dims:((300),210) in
-        
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-    ;;
-    
-    let renderReload windows_info = 
-    
-        let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
-    
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/reload1.bmp"))
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x,position_hud_y)
-            ~dims:((300),210) in
-        
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-            
-            (*reload := false; *)
-    
-        ()
-    ;;
-    
-    let renderReloadPart2 windows_info = 
-    
-        let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
-    
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/reload2.bmp"))
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x,position_hud_y)
-            ~dims:((300),210) in
-        
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-            
-            (*reload := false; *)
-    
-        ()
-    ;;
-    
-    let renderReloadPart3 windows_info = 
-        print_string "hey \n";
-    
-        let position_hud_x = windows_info.drawer2D_width / 2 + (windows_info.drawer2D_width / 5) in 
-        let position_hud_y = windows_info.drawer2D_height - windows_info.drawer2D_height / 2 + 25 in      
-    
-        let img = Sdltexture.create_from_surface 
-            windows_info.render (Sdlsurface.load_bmp ~filename:("main/resources/textures/reload3.bmp"))
-            in 
-    
-        let dst_rect = Sdlrect.make 
-            ~pos:(position_hud_x,position_hud_y)
-            ~dims:((300),210) in
-        
-    
-        Sdlrender.copyEx 
-            windows_info.render 
-            ~texture:img 
-            ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
-            ~dst_rect: dst_rect
-            ~angle:0.
-            ();
-            
-            (*reload := false; *)
-    
-        ()
-    ;;
+let renderHud game = 
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = 0 in 
+    let position_hud_y = h - h / 5 in  
+    let dst_rect = Sdlrect.make 
+        ~pos:(position_hud_x,position_hud_y)
+        ~dims:(w,h/5) in
 
-    
+    Sdlrender.copyEx
+        game.windows_info.render 
+        ~texture:(List.assoc "hud" game.textures) 
+        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
+        ~dst_rect: dst_rect
+        ~angle:0.
+        ();;
 
-let renderEnemy windows_info level textures enemy =
+let renderPV game level =
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w/5 + 50 in 
+    let position_hud_y = h - h/7 - h/25 in  
+    let hp = level.player.entity.hp * 100 / level.player.entity.maxHp in 
+    let hp= if hp mod 10 <> 0 then 
+        hp + (10 - (hp mod 10)) else hp in
+    let dst_rect = Sdlrect.make 
+        ~pos:(position_hud_x,position_hud_y)
+        ~dims:(w/7,h/7) in
+    Sdlrender.copyEx 
+        game.windows_info.render 
+        ~texture:(List.assoc (string_of_int hp) game.texts) 
+        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
+        ~dst_rect: dst_rect
+        ~angle:0.
+        ();;
+
+let renderArme game = 
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w / 2 - (w / 5 / 2) in 
+    let position_hud_y = h - h /5 - h/4 in      
+    let dst_rect = Sdlrect.make 
+        ~pos:(position_hud_x,position_hud_y)
+        ~dims:(w/5, h/4) in
+    Sdlrender.copyEx 
+        game.windows_info.render 
+        ~texture:(List.assoc "arme" game.textures) 
+        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
+        ~dst_rect: dst_rect
+        ~angle:0.
+        ();;
+
+let renderShotgunBlast game = 
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w / 2 - (w / 5 / 2) in 
+    let position_hud_y = h - h/5 - h/5 in      
+    let dst_rect = Sdlrect.make 
+        ~pos:(position_hud_x,position_hud_y-120)
+        ~dims:(w/5,h/5) in
+    Sdlrender.copyEx 
+        game.windows_info.render 
+        ~texture:(List.assoc "shotgun_blast" game.textures) 
+        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
+        ~dst_rect: dst_rect
+        ~angle:0.
+        ();
+;;
+
+let renderReload game part = 
+    let w = game.windows_info.drawer3D_width in
+    let h = game.windows_info.drawer3D_height in
+    let position_hud_x = w / 2 - (w/5/2) in 
+    let position_hud_y = h - h/5 - h/4 in     
+    let dst_rect = Sdlrect.make 
+        ~pos:(position_hud_x,position_hud_y)
+        ~dims:(w/5, h/4) in
+    Sdlrender.copyEx 
+        game.windows_info.render 
+        ~texture:(List.assoc ("reload" ^ part) game.textures) 
+        ~src_rect:(Sdlrect.make ~pos:(0,0) ~dims:(600,100))
+        ~dst_rect: dst_rect
+        ~angle:0.
+        ();;
+
+
+let renderEnemy game enemy =
+    let windows_info = game.windows_info in 
+    let level = Option.get game.level in 
+    let textures = game.textures in
     if enemy.in_fov then (
 
         let text_height = 
@@ -274,7 +181,10 @@ let renderEnemy windows_info level textures enemy =
     )
 
 
-let render windows_info level textures rays = 
+let render game rays = 
+    let windows_info = game.windows_info in 
+    let level = Option.get game.level in 
+    let textures = game.textures in
     (* Rendering the sky *)
     if level.map.ceiling then (
         let text = List.assoc "sky" textures in
@@ -291,37 +201,43 @@ let render windows_info level textures rays =
     let rec render_rays_and_enemies rays enemies = 
         match rays, enemies with
         | [], [] -> ()
-        | ray :: r1, [] -> drawRay windows_info level textures ray; render_rays_and_enemies r1 []
-        | [], t :: r2 -> renderEnemy windows_info level textures t; render_rays_and_enemies [] r2
+        | ray :: r1, [] -> drawRay game ray; render_rays_and_enemies r1 []
+        | [], t :: r2 -> renderEnemy game t; render_rays_and_enemies [] r2
         | ray :: r1, enemy :: r2 -> 
-            if ray.distance < enemy.playerEnemyDistance then (
-                renderEnemy windows_info level textures enemy;
+            if ray.distance +. 0.5 < enemy.playerEnemyDistance then (
+                renderEnemy game enemy;
                 render_rays_and_enemies rays r2
             ) else (
-                drawRay windows_info level textures ray;
+                drawRay game ray;
                 render_rays_and_enemies r1 enemies
             )
     in 
 
-    let enemies = List.map (Enemy.computeInfo level.player) level.enemies in
+    let enemies = List.map (Entity.computeInfo level level.player) level.enemies in
     let enemies = List.filter (fun e -> e.in_fov) enemies in
     let enemies = List.fast_sort ( fun e1 e2 ->
                 if e1.playerEnemyDistance > e2.playerEnemyDistance then -1 else 1) enemies in
     render_rays_and_enemies rays enemies;
     
-    renderHud windows_info;
-    renderPV windows_info level; 
-    renderArme windows_info; 
+    renderHud game;
+    renderPV game level; 
 
-            (* debut animation *)
-            let localtime = Unix.localtime (Unix.time ()) in 
-            if float_of_int (localtime.tm_sec) < !sec_fin -. 1.9 then (renderShotgunBlast windows_info;  
-            if float_of_int (localtime.tm_sec) < !sec_fin -. 1.5 then ( (* Animation *)     
-            renderReload windows_info ; )
-            ) else if float_of_int (localtime.tm_sec) < !sec_fin -. 0.75 then (renderReloadPart2 windows_info;) 
-            else if float_of_int (localtime.tm_sec) < !sec_fin  then (renderReloadPart3 windows_info; ) 
-            else (renderArme windows_info; reload := false;) 
-            
-            (* fin animation *)
+    (* debut animation de l'arme *)
+    let lastHit = level.player.entity.weapon.lastHit in
+    let delay = level.player.entity.weapon.delay in
+    let now = Unix.gettimeofday () in 
+    if now > lastHit +. (delay *. 0.6) then (
+        renderArme game
+    ) else if now > lastHit +. (delay *. 0.4) then (
+        renderReload game "3"
+    ) else if now > lastHit +. (delay *. 0.2) then (
+        renderReload game "2"
+    ) else (
+        renderReload game "1";
+        if now < lastHit +. (delay *. 0.2) then 
+            renderShotgunBlast game; 
+    );
+    (* fin animation *)
     
     ;;
+

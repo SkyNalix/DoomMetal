@@ -9,7 +9,7 @@ let touchedBlockAction game x y =
   match level.map.plot.(y).(x) with
     | DOOR -> level.map.plot.(y).(x) <- NOTHING
     | LEVEL_END -> 
-      game.state <- LEVEL_FINISHED;
-      game.level <- Some (get "1");
+      game.state <- LEVEL_FINISHED
     | _ -> ()
   ;;
+
